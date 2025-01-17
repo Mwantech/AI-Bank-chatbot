@@ -1,0 +1,88 @@
+{
+    "intents": {
+        "balance_inquiry": {
+            "patterns": [
+                "what is my balance",
+                "check balance",
+                "account balance",
+                "how much money do i have",
+                "show me my balance"
+            ],
+            "responses": [
+                "I'll help you check your account balance. Please wait while I fetch that information.",
+                "Let me retrieve your current balance for you.",
+                "I'll look up your account balance right away."
+            ]
+        },
+        "transfer_money": {
+            "patterns": [
+                "transfer money",
+                "send money",
+                "make a payment",
+                "pay someone",
+                "wire transfer"
+            ],
+            "responses": [
+                "I'll help you transfer money. Please provide the recipient's details.",
+                "I can assist you with making a transfer. Who would you like to send money to?",
+                "Let's process that transfer for you. I'll need some details first."
+            ]
+        },
+        "loan_inquiry": {
+            "patterns": [
+                "need a loan",
+                "loan application",
+                "borrow money",
+                "loan status",
+                "apply for loan"
+            ],
+            "responses": [
+                "I can help you with loan-related inquiries. What specific information do you need?",
+                "Let me assist you with your loan request. What type of loan are you interested in?",
+                "I'll help you with your loan application. What amount are you looking to borrow?"
+            ]
+        },
+        "customer_support": {
+            "patterns": [
+                "need help",
+                "support required",
+                "having issues",
+                "problem with",
+                "cant access"
+            ],
+            "responses": [
+                "I'm here to help. Could you describe the issue you're experiencing?",
+                "I'll assist you with your concern. What seems to be the problem?",
+                "Let me help you resolve this issue. Can you provide more details?"
+            ]
+        },
+        "investment_info": {
+            "patterns": [
+                "investment options",
+                "mutual funds",
+                "fixed deposit",
+                "invest money",
+                "investment plans"
+            ],
+            "responses": [
+                "I can guide you through our investment options. What type of investment interests you?",
+                "Let me show you our available investment plans. What's your investment goal?",
+                "I'll help you explore investment opportunities. What's your preferred investment duration?"
+            ]
+        },
+        "location_search": {
+            "patterns": [
+                "find atm",
+                "nearest branch",
+                "bank location",
+                "closest atm",
+                "branch address"
+            ],
+            "responses": [
+                "I'll help you find the nearest location. Could you share your current location?",
+                "Let me locate the closest branch/ATM for you. Where are you currently?",
+                "I can help you find nearby banking facilities. What's your location?"
+            ]
+        }
+    }
+}
