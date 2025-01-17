@@ -1,4 +1,7 @@
 # app.py
+from dotenv import load_dotenv
+load_dotenv()
+
 from flask import Flask, send_file
 from config import app, db
 from routes.account_routes import account_bp
@@ -7,6 +10,8 @@ from routes.loan_routes import loan_bp
 from routes.location_routes import location_bp
 from routes.investment_routes import investment_bp
 from routes.chatbot_routes import chatbot_bp
+
+
 
 # Register blueprints
 app.register_blueprint(account_bp, url_prefix='/api/accounts')

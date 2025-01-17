@@ -3,7 +3,7 @@ from services.nlp_service import NLPService
 import os
 
 chatbot_bp = Blueprint('chatbot', __name__)
-nlp_service = NLPService(api_key=os.environ.get("OPENAI_API_KEY"))
+nlp_service = NLPService(api_key=os.getenv("OPENAI_API_KEY"))
 
 @chatbot_bp.route('/chat', methods=['POST'])
 def chat():

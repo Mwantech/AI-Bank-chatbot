@@ -132,7 +132,7 @@ class NLPService:
             # Get GPT response using the new API method
             chat_completion = self.client.chat.completions.create(
                 messages=messages,
-                model="gpt-4",
+                model="gpt-4o",
                 max_tokens=150,
                 temperature=0.7
             )
