@@ -1,0 +1,62 @@
+{
+    "intents": {
+        "greeting": {
+            "patterns": [
+                "hello",
+                "hi",
+                "hey",
+                "how are you"
+            ],
+            "responses": [
+                "Hello! I'm your banking assistant. How can I help you today?"
+            ]
+        },
+        "transfer_money": {
+            "patterns": [
+                "transfer",
+                "send money",
+                "pay someone"
+            ],
+            "responses": [
+                "I can help you transfer money. Who would you like to send money to?"
+            ]
+        },
+        "loan_inquiry": {
+            "patterns": [
+                "loan",
+                "borrow",
+                "credit"
+            ],
+            "responses": [
+                "I can help you with a loan application. What amount are you looking to borrow?"
+            ]
+        },
+        "location_search": {
+            "patterns": [
+                "atm",
+                "branch",
+                "location",
+                "find"
+            ],
+            "responses": [
+                "I'll locate the closest branch/ATM for you. Where are you currently?"
+            ]
+        },
+        "balance_inquiry": {
+            "patterns": [
+                "balance",
+                "how much",
+                "check account"
+            ],
+            "responses": [
+                "I'll help you check your balance. Please log in to your account first."
+            ]
+        },
+        "general": {
+            "patterns": [],
+            "responses": [
+                "I'll help you with that. Could you provide more details?"
+            ]
+        }
+    }
+}

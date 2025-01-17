@@ -1,4 +1,11 @@
 # AI-Bank-chatbot
+
+
+
+New-Item -ItemType File -Path "banking api/routes/__init__.py"
+New-Item -ItemType File -Path "banking api/services/__init__.py"
+New-Item -ItemType File -Path "banking api\__init__.py"
+
 banking_api/
 ├── config.py
 ├── app.py
