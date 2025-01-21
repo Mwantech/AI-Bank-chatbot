@@ -23,3 +23,15 @@ banking_api/
 │   ├── location_routes.py
 │   ├── investment_routes.py
 │   └── chatbot_routes.py
+
+
+your_project/
+├── models/
+│   ├── vectorizer.pkl
+│   ├── patterns.pkl
+│   └── intents.pkl
+├── data/
+│   ├── intent_patterns.json
+│   └── response_cache.pkl
+└── services/
+    └── nlp_service.py
