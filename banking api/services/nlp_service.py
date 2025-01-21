@@ -1,215 +1,128 @@
 import json
-from openai import OpenAI
 from pathlib import Path
 import os
 from datetime import datetime, timedelta
 import pickle
 import re
+from typing import Dict, Any
+import numpy as np
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+import spacy
+import logging
 
 class NLPService:
-    def __init__(self, api_key):
-        self.client = OpenAI(api_key=api_key)
-        self.base_path = Path(os.path.abspath(os.path.dirname(__file__)))
+    def __init__(self, model_dir: str = 'models'):
+        self.base_path = Path(os.path.abspath(os.path.dirname(__file__))).parent
         self.cache_file = self.base_path / 'data' / 'response_cache.pkl'
         self.cache_duration = timedelta(hours=24)
-        self.conversation_context = {}  # Store context for each user
+        self.conversation_context = {}
+        
+        # Set up logging
+        logging.basicConfig(
+            level=logging.INFO,
+            format='%(asctime)s - %(levelname)s - %(message)s'
+        )
+        self.logger = logging.getLogger(__name__)
+
+        # Initialize NLP components
+        self.lemmatizer = WordNetLemmatizer()
+        self.stop_words = set(stopwords.words('english'))
+        try:
+            self.nlp = spacy.load('en_core_web_sm')
+        except OSError:
+            self.logger.warning("Downloading spacy model...")
+            os.system('python -m spacy download en_core_web_sm')
+            self.nlp = spacy.load('en_core_web_sm')
 
         # Create data directory if it doesn't exist
         data_dir = self.base_path / 'data'
-        if not data_dir.exists():
-            data_dir.mkdir(parents=True)
+        data_dir.mkdir(parents=True, exist_ok=True)
 
-        self.load_intents()
+        # Load model and components
+        self.model_dir = self.base_path / model_dir
+        self.load_model()
         self.load_cache()
 
+    def load_model(self) -> None:
+        """Load the trained model components"""
+        try:
+            # Load vectorizer components
+            with open(self.model_dir / 'vectorizer.pkl', 'rb') as f:
+                vectorizer_dict = pickle.load(f)
+                
+            # Initialize and configure vectorizer
+            self.vectorizer = TfidfVectorizer()
+            self.vectorizer.vocabulary_ = vectorizer_dict['vocabulary_']
+            self.vectorizer.idf_ = vectorizer_dict['idf_']
+            if 'stop_words_' in vectorizer_dict:
+                self.vectorizer.stop_words_ = vectorizer_dict['stop_words_']
+            
+            # Load patterns
+            with open(self.model_dir / 'patterns.pkl', 'rb') as f:
+                patterns_data = pickle.load(f)
+                self.patterns = patterns_data['patterns']
+                self.pattern_classes = patterns_data['pattern_classes']
+            
+            # Load intents
+            with open(self.model_dir / 'intents.pkl', 'rb') as f:
+                self.intents = pickle.load(f)
+            
+            # Transform patterns
+            self.X = self.vectorizer.transform(self.patterns)
+            self.logger.info("Model loaded successfully")
+            
+        except Exception as e:
+            self.logger.error(f"Error loading model: {str(e)}")
+            raise
+
     def load_cache(self):
-        """Load cached responses from file"""
+        """Load cached responses"""
         if os.path.exists(self.cache_file):
-            try:
-                with open(self.cache_file, 'rb') as f:
-                    cache_data = pickle.load(f)
-                    current_time = datetime.now()
-                    self.cache = {
-                        k: v for k, v in cache_data.items()
-                        if current_time - v['timestamp'] < self.cache_duration
-                    }
-            except Exception as e:
-                print(f"Error loading cache: {str(e)}")
-                self.cache = {}
+            with open(self.cache_file, 'rb') as f:
+                self.cache = pickle.load(f)
         else:
             self.cache = {}
 
-    def save_cache(self):
-        """Save responses to cache file"""
+    def get_response(self, text: str, user_id: str = 'default') -> Dict[str, Any]:
+        """Generate response based on user input"""
         try:
-            with open(self.cache_file, 'wb') as f:
-                pickle.dump(self.cache, f)
-        except Exception as e:
-            print(f"Error saving cache: {str(e)}")
-
-    def load_intents(self):
-        """Load intent patterns from JSON file"""
-        intent_file = self.base_path / 'data' / 'intent_patterns.json'
-
-        # Create default intents if file doesn't exist
-        if not intent_file.exists():
-            default_intents = {
-                "intents": {
-                    "greeting": {
-                        "patterns": ["hello", "hi", "hey", "how are you"],
-                        "responses": ["Hello! I'm your banking assistant. How can I help you today?"]
-                    },
-                    "transfer_money": {
-                        "patterns": ["transfer", "send money", "pay someone"],
-                        "responses": ["I can help you transfer money. Who would you like to send money to?"]
-                    },
-                    "loan_inquiry": {
-                        "patterns": ["loan", "borrow", "credit"],
-                        "responses": ["I can help you with a loan application. What amount are you looking to borrow?"]
-                    },
-                    "location_search": {
-                        "patterns": ["atm", "branch", "location", "find"],
-                        "responses": ["I'll locate the closest branch/ATM for you. Where are you currently?"]
-                    },
-                    "balance_inquiry": {
-                        "patterns": ["balance", "how much", "check account"],
-                        "responses": ["I'll help you check your balance. Please log in to your account first."]
-                    },
-                    "general": {
-                        "patterns": [],
-                        "responses": ["I'll help you with that. Could you provide more details?"]
-                    }
-                }
-            }
-
-            # Create the data directory if it doesn't exist
-            intent_file.parent.mkdir(parents=True, exist_ok=True)
-
-            # Save default intents
-            with open(intent_file, 'w') as f:
-                json.dump(default_intents, f, indent=4)
-
-            self.intent_data = default_intents
-        else:
-            with open(intent_file, 'r') as f:
-                self.intent_data = json.load(f)
-
-    def get_response(self, user_input, user_id='default'):
-        # Initialize or get conversation context
-        if user_id not in self.conversation_context:
-            self.conversation_context[user_id] = {
-                'current_intent': None,
-                'conversation_history': [],
-                'current_state': None
-            }
-
-        context = self.conversation_context[user_id]
-
-        # Add user input to conversation history
-        context['conversation_history'].append({"role": "user", "content": user_input})
-
-        try:
-            # Check cache first
-            cache_key = f"{user_id}:{user_input}"
-            if cache_key in self.cache:
-                cache_entry = self.cache[cache_key]
-                if datetime.now() - cache_entry['timestamp'] < self.cache_duration:
-                    return cache_entry['response']
-
-            # Build complete conversation for GPT
-            system_message = """You are an AI banking assistant. Your role is to:
-            1. Help with banking services like transfers, loans, and balance inquiries
-            2. Provide clear, concise responses
-            3. Ask for necessary information step by step
-            4. Remember context from previous messages
-            5. Guide users through banking processes safely"""
-
-            messages = [
-                {"role": "system", "content": system_message},
-                *context['conversation_history'][-5:]  # Include last 5 messages for context
-            ]
-
-            # Get GPT response using the new API method
-            chat_completion = self.client.chat.completions.create(
-                messages=messages,
-                model="gpt-4o",
-                max_tokens=150,
-                temperature=0.7
-            )
-            gpt_response = chat_completion.choices[0].message.content.strip()
-
-            # Log the response for debugging
-            print("GPT Response:", gpt_response)
-
-            intent_info = self.classify_intent(user_input, context['current_intent'])
-            if intent_info['intent'] != 'general':
-                context['current_intent'] = intent_info['intent']
-
-            final_response = self.format_response(intent_info, gpt_response, context)
-            self.cache[cache_key] = {'response': final_response, 'timestamp': datetime.now()}
-            self.save_cache()
-            context['conversation_history'].append({"role": "assistant", "content": final_response['response']})
-
-            return final_response
-
-        except Exception as e:
-            print(f"Error: {str(e)}")
-            return {"intent": "error", "response": "Something went wrong. Please try again."}
-
-    def classify_intent(self, user_input, current_intent=None):
-        user_input = user_input.lower()
-
-        # Check each intent's patterns using regex for word boundary matches
-        for intent, data in self.intent_data['intents'].items():
-            for pattern in data['patterns']:
-                if re.search(rf'\b{re.escape(pattern.lower())}\b', user_input):
-                    return {
-                        'intent': intent,
-                        'response': self.get_random_response(intent)
-                    }
-
-        # If no new intent is detected and we have a current intent, continue with it
-        if current_intent:
+            # Process input
+            processed_text = self.preprocess_text(text)
+            input_vector = self.vectorizer.transform([processed_text])
+            similarities = cosine_similarity(input_vector, self.X)
+            
+            # Get most similar pattern
+            most_similar = np.argmax(similarities)
+            intent = self.pattern_classes[most_similar]
+            confidence = float(similarities[0][most_similar])
+            
+            # Get response
+            responses = self.intents['intents'][intent]['responses']
+            response = np.random.choice(responses)
+            
             return {
-                'intent': current_intent,
-                'response': self.get_random_response(current_intent)
+                'intent': intent,
+                'response': response,
+                'confidence': confidence
+            }
+            
+        except Exception as e:
+            self.logger.error(f"Error generating response: {str(e)}")
+            return {
+                'intent': 'error',
+                'response': "I apologize, but I'm experiencing technical difficulties.",
+                'confidence': 0.0
             }
 
-        return {
-            'intent': 'general',
-            'response': self.get_random_response('general')
-        }
-
-    def format_response(self, intent_info, gpt_response, context):
-        # Handle different intents and their states
-        intent = intent_info['intent']
-
-        if intent == 'transfer_money':
-            if 'amount' not in gpt_response.lower() and 'recipient' not in context:
-                return {
-                    'intent': intent,
-                    'response': "Please specify who you'd like to send money to and the amount."
-                }
-        elif intent == 'loan_inquiry':
-            if 'amount' in gpt_response.lower():
-                context['current_state'] = 'awaiting_amount'
-            elif context.get('current_state') == 'awaiting_amount':
-                context['current_state'] = 'amount_received'
-        elif intent == 'location_search':
-            if any(location in gpt_response.lower() for location in ['where', 'location', 'address']):
-                return {
-                    'intent': intent,
-                    'response': "I'll help you find the nearest ATM. Please share your current location or city."
-                }
-
-        return {
-            'intent': intent,
-            'response': gpt_response
-        }
-
-    def get_random_response(self, intent):
-        import random
-        responses = self.intent_data['intents'].get(intent, {}).get('responses', [])
-        if not responses:
-            responses = ["I understand you need help with that. Let me assist you."]
-        return random.choice(responses)
+    def preprocess_text(self, text: str) -> str:
+        """Preprocess input text"""
+        text = text.lower()
+        text = re.sub(r'[^\w\s]', '', text)
+        tokens = word_tokenize(text)
+        tokens = [self.lemmatizer.lemmatize(token) for token in tokens 
+                 if token not in self.stop_words]
+        return ' '.join(tokens)
