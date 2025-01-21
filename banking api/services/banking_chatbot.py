@@ -13,12 +13,20 @@ import logging
 import os
 import pickle
 from pathlib import Path
+<<<<<<< HEAD
 from typing import Dict, List, Any, Optional, Tuple
+=======
+from typing import Dict, List, Any, Optional
+>>>>>>> 9fdb6d10d289e5760e15d46ba47a2b1e134d69f0
 
 class BankingChatbot:
     def __init__(self, intents_file: str = 'intents.json', model_dir: str = 'models'):
         """
+<<<<<<< HEAD
         Initialize the Banking Chatbot with necessary components
+=======
+        Initialize the Banking Chatbot with necessary NLP components and intents
+>>>>>>> 9fdb6d10d289e5760e15d46ba47a2b1e134d69f0
         
         Args:
             intents_file (str): Path to the intents JSON file
@@ -31,17 +39,26 @@ class BankingChatbot:
         )
         self.logger = logging.getLogger(__name__)
         
+<<<<<<< HEAD
         # Setup paths
+=======
+        # Setup paths - modified to handle the correct directory structure
+>>>>>>> 9fdb6d10d289e5760e15d46ba47a2b1e134d69f0
         self.base_path = Path(os.path.abspath(os.path.dirname(__file__))).parent
         self.model_dir = self.base_path / model_dir
         self.model_dir.mkdir(parents=True, exist_ok=True)
         
         try:
+<<<<<<< HEAD
             # Initialize NLP components
+=======
+            # Initialize NLTK components
+>>>>>>> 9fdb6d10d289e5760e15d46ba47a2b1e134d69f0
             self.lemmatizer = WordNetLemmatizer()
             self.stop_words = set(stopwords.words('english'))
             
             # Load spaCy model
+<<<<<<< HEAD
             try:
                 self.nlp = spacy.load('en_core_web_sm')
             except OSError:
@@ -61,16 +78,39 @@ class BankingChatbot:
                 'account_type': r'(savings|checking|current|credit)',
                 'loan_type': r'(personal|home|auto|business|student)\s*loan'
             }
+=======
+            self.nlp = spacy.load('en_core_web_sm')
+>>>>>>> 9fdb6d10d289e5760e15d46ba47a2b1e134d69f0
             
             # Load or create model
             if self.model_exists():
                 self.load_model()
             else:
+<<<<<<< HEAD
                 self.load_intents(self.base_path / 'data' / intents_file)
                 self.prepare_training_data()
                 self.train_model()
                 self.save_model()
             
+=======
+                # Modified to look for intents.json in the data directory
+                self.load_intents(self.base_path / 'data' / intents_file)
+                self.patterns: List[str] = []
+                self.pattern_classes: List[str] = []
+                self.prepare_training_data()
+                
+                # Initialize and fit vectorizer
+                self.vectorizer = TfidfVectorizer(tokenizer=self.preprocess_text)
+                self.X = self.vectorizer.fit_transform(self.patterns)
+                
+                # Save the model
+                self.save_model()
+            
+            # Initialize conversation management
+            self.conversation_context: Dict[str, Dict] = {}
+            self.user_profiles: Dict[str, Dict] = {}
+            
+>>>>>>> 9fdb6d10d289e5760e15d46ba47a2b1e134d69f0
             self.logger.info("Banking Chatbot initialized successfully")
             
         except Exception as e:
@@ -85,13 +125,18 @@ class BankingChatbot:
                 
             with open(intents_file, 'r', encoding='utf-8') as file:
                 self.intents = json.load(file)
+<<<<<<< HEAD
                 
             self.logger.info(f"Intents loaded successfully from {intents_file}")
             
+=======
+            self.logger.info(f"Intents loaded successfully from {intents_file}")
+>>>>>>> 9fdb6d10d289e5760e15d46ba47a2b1e134d69f0
         except Exception as e:
             self.logger.error(f"Error loading intents file: {str(e)}")
             raise
 
+<<<<<<< HEAD
     def prepare_training_data(self) -> None:
         """Prepare patterns and their respective classes for training"""
         try:
@@ -120,6 +165,8 @@ class BankingChatbot:
             self.logger.error(f"Error training model: {str(e)}")
             raise
 
+=======
+>>>>>>> 9fdb6d10d289e5760e15d46ba47a2b1e134d69f0
     def preprocess_text(self, text: str) -> List[str]:
         """
         Clean and preprocess input text
@@ -132,8 +179,12 @@ class BankingChatbot:
         """
         try:
             # Convert to lowercase and remove special characters
+<<<<<<< HEAD
             text = text.lower()
             text = re.sub(r'[^\w\s]', '', text)
+=======
+            text = re.sub(r'[^a-zA-Z0-9\s]', '', text.lower())
+>>>>>>> 9fdb6d10d289e5760e15d46ba47a2b1e134d69f0
             
             # Tokenize and remove stopwords
             tokens = word_tokenize(text)
@@ -141,19 +192,41 @@ class BankingChatbot:
                      if token not in self.stop_words]
             
             return tokens
+<<<<<<< HEAD
             
+=======
+>>>>>>> 9fdb6d10d289e5760e15d46ba47a2b1e134d69f0
         except Exception as e:
             self.logger.error(f"Error in text preprocessing: {str(e)}")
             return []
 
+<<<<<<< HEAD
     def extract_entities(self, text: str) -> Dict[str, Any]:
         """
         Extract relevant entities from text using patterns and spaCy
+=======
+    def prepare_training_data(self) -> None:
+        """Prepare training data from intents"""
+        try:
+            for intent in self.intents['intents']:
+                for pattern in self.intents['intents'][intent]['patterns']:
+                    self.patterns.append(pattern)
+                    self.pattern_classes.append(intent)
+            self.logger.info("Training data prepared successfully")
+        except Exception as e:
+            self.logger.error(f"Error preparing training data: {str(e)}")
+            raise
+
+    def extract_banking_entities(self, text: str) -> Dict[str, Optional[str]]:
+        """
+        Extract banking-specific entities from text
+>>>>>>> 9fdb6d10d289e5760e15d46ba47a2b1e134d69f0
         
         Args:
             text (str): Input text to extract entities from
             
         Returns:
+<<<<<<< HEAD
             Dict[str, Any]: Dictionary of extracted entities
         """
         try:
@@ -218,6 +291,116 @@ class BankingChatbot:
     def get_response(self, user_id: str, text: str) -> Dict[str, Any]:
         """
         Generate appropriate response based on user input and context
+=======
+            Dict[str, Optional[str]]: Dictionary of extracted entities
+        """
+        try:
+            doc = self.nlp(text)
+            entities = {
+                'amount': None,
+                'recipient': None,
+                'account_type': None,
+                'date': None,
+                'transaction_type': None
+            }
+            
+            # Extract amounts (looking for currency patterns)
+            amount_pattern = re.compile(r'\$?\d+(?:,\d{3})*(?:\.\d{2})?')
+            amounts = amount_pattern.findall(text)
+            if amounts:
+                entities['amount'] = amounts[0]
+            
+            # Extract account types
+            account_types = ['savings', 'checking', 'current', 'credit']
+            text_tokens = text.lower().split()
+            for acc_type in account_types:
+                if acc_type in text_tokens:
+                    entities['account_type'] = acc_type
+            
+            # Extract transaction types
+            transaction_types = ['deposit', 'withdrawal', 'transfer', 'payment']
+            for trans_type in transaction_types:
+                if trans_type in text_tokens:
+                    entities['transaction_type'] = trans_type
+            
+            # Extract recipient names using spaCy
+            for ent in doc.ents:
+                if ent.label_ == 'PERSON':
+                    entities['recipient'] = ent.text
+                elif ent.label_ == 'DATE':
+                    entities['date'] = ent.text
+            
+            return entities
+        except Exception as e:
+            self.logger.error(f"Error extracting entities: {str(e)}")
+            return {
+                'amount': None,
+                'recipient': None,
+                'account_type': None,
+                'date': None,
+                'transaction_type': None
+            }
+
+    def get_humanized_response(self, intent: str, entities: Dict[str, Any], text: str) -> str:
+        """
+        Generate a human-like response based on intent and entities
+        
+        Args:
+            intent (str): Detected intent
+            entities (Dict[str, Any]): Extracted entities
+            text (str): Original input text
+            
+        Returns:
+            str: Humanized response
+        """
+        try:
+            base_response = random.choice(self.intents['intents'][intent]['responses'])
+            
+            # Add time-based greeting
+            hour = datetime.datetime.now().hour
+            greeting = ""
+            if 5 <= hour < 12:
+                greeting = "Good morning! "
+            elif 12 <= hour < 17:
+                greeting = "Good afternoon! "
+            elif 17 <= hour < 22:
+                greeting = "Good evening! "
+            
+            # Personalize response based on entities
+            response = base_response
+            if entities['amount']:
+                response = response.replace("the amount", f"${entities['amount']}")
+            if entities['recipient']:
+                response = response.replace("the recipient", entities['recipient'])
+            
+            # Add conversational fillers
+            fillers = [
+                "Let me see... ",
+                "Just a moment... ",
+                "Alright, ",
+                "Sure thing! ",
+                "I understand. ",
+                "Of course! "
+            ]
+            
+            # Add empathy phrases for certain intents
+            if intent in ['customer_support', 'account_security']:
+                empathy_phrases = [
+                    "I understand your concern. ",
+                    "I'll help you sort this out. ",
+                    "Don't worry, I'm here to help. "
+                ]
+                response = f"{random.choice(empathy_phrases)}{response}"
+            
+            return f"{greeting}{random.choice(fillers)}{response}"
+        except Exception as e:
+            self.logger.error(f"Error generating humanized response: {str(e)}")
+            return "I apologize, but I'm having trouble generating a response. How else can I assist you?"
+
+    def get_response(self, user_id: str, text: str) -> Dict[str, Any]:
+        """
+        Generate appropriate response based on user input
+>>>>>>> 9fdb6d10d289e5760e15d46ba47a2b1e134d69f0
         
         Args:
             user_id (str): Unique identifier for the user
@@ -227,6 +410,7 @@ class BankingChatbot:
             Dict[str, Any]: Response containing intent, entities, and generated text
         """
         try:
+<<<<<<< HEAD
             # Get or initialize user context
             context = self.get_user_context(user_id)
             
@@ -312,11 +496,50 @@ class BankingChatbot:
             )
             return {
                 'response': followup_question,
+=======
+            # Preprocess input
+            processed_text = ' '.join(self.preprocess_text(text))
+            
+            # Vectorize input and find most similar pattern
+            input_vector = self.vectorizer.transform([processed_text])
+            similarities = cosine_similarity(input_vector, self.X)
+            most_similar = np.argmax(similarities)
+            
+            # Get intent and confidence score
+            intent = self.pattern_classes[most_similar]
+            confidence = float(similarities[0][most_similar])
+            
+            # Update user context
+            if user_id not in self.conversation_context:
+                self.conversation_context[user_id] = {'last_intent': None, 'turns': 0}
+            self.conversation_context[user_id]['last_intent'] = intent
+            self.conversation_context[user_id]['turns'] += 1
+            
+            # Only proceed if confidence is high enough
+            if confidence < 0.2:
+                return {
+                    'response': "I'm not quite sure what you're asking. Could you please rephrase that?",
+                    'intent': 'unknown',
+                    'confidence': confidence,
+                    'entities': {},
+                    'requires_clarification': True
+                }
+            
+            # Extract entities
+            entities = self.extract_banking_entities(text)
+            
+            # Generate response
+            response = self.get_humanized_response(intent, entities, text)
+            
+            return {
+                'response': response,
+>>>>>>> 9fdb6d10d289e5760e15d46ba47a2b1e134d69f0
                 'intent': intent,
                 'entities': entities,
                 'confidence': confidence,
                 'requires_clarification': False
             }
+<<<<<<< HEAD
         
         # Generate base response
         response = random.choice(intent_data.get('responses', ["I'll help you with that."]))
@@ -399,12 +622,35 @@ class BankingChatbot:
         })
         
         self.session_data[user_id]['last_active'] = datetime.datetime.now()
+=======
+        except Exception as e:
+            self.logger.error(f"Error generating response: {str(e)}")
+            return {
+                'response': "I apologize, but I'm experiencing technical difficulties. Please try again later.",
+                'intent': 'error',
+                'confidence': 0.0,
+                'entities': {},
+                'requires_clarification': True
+            }
+>>>>>>> 9fdb6d10d289e5760e15d46ba47a2b1e134d69f0
 
     def model_exists(self) -> bool:
         """Check if trained model files exist"""
         try:
+<<<<<<< HEAD
             required_files = ['vectorizer.pkl', 'patterns.pkl', 'intents.pkl']
             return all((self.model_dir / file).exists() for file in required_files)
+=======
+            vectorizer_path = self.model_dir / 'vectorizer.pkl'
+            patterns_path = self.model_dir / 'patterns.pkl'
+            intents_path = self.model_dir / 'intents.pkl'
+            
+            return all([
+                vectorizer_path.exists(),
+                patterns_path.exists(),
+                intents_path.exists()
+            ])
+>>>>>>> 9fdb6d10d289e5760e15d46ba47a2b1e134d69f0
         except Exception as e:
             self.logger.error(f"Error checking model existence: {str(e)}")
             return False
@@ -416,7 +662,11 @@ class BankingChatbot:
             with open(self.model_dir / 'vectorizer.pkl', 'wb') as f:
                 pickle.dump(self.vectorizer, f, protocol=4)
             
+<<<<<<< HEAD
             # Save patterns
+=======
+            # Save patterns data
+>>>>>>> 9fdb6d10d289e5760e15d46ba47a2b1e134d69f0
             patterns_data = {
                 'patterns': self.patterns,
                 'pattern_classes': self.pattern_classes
@@ -427,9 +677,14 @@ class BankingChatbot:
             # Save intents
             with open(self.model_dir / 'intents.pkl', 'wb') as f:
                 pickle.dump(self.intents, f, protocol=4)
+<<<<<<< HEAD
             
             self.logger.info("Model saved successfully")
             
+=======
+                
+            self.logger.info("Model saved successfully")
+>>>>>>> 9fdb6d10d289e5760e15d46ba47a2b1e134d69f0
         except Exception as e:
             self.logger.error(f"Error saving model: {str(e)}")
             raise
