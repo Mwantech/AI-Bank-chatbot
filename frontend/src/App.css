@@ -1,42 +1,172 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+/* Reset default styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+body {
+  background-color: #f0f2f5;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+/* Common card styles */
+.card {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  width: 100%;
+}
+
+/* Chat interface styles */
+.chat-container {
+  max-width: 400px;
+  width: 100%;
+}
+
+.chat-header {
+  background-color: #0077ff;
+  color: white;
+  padding: 20px;
+  text-align: center;
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.chat-messages {
+  height: 400px;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.chat-input-container {
+  padding: 16px;
+  display: flex;
+  gap: 10px;
+  background: white;
+}
+
+.chat-input {
+  flex: 1;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 25px;
+  background: #f0f2f5;
+  font-size: 14px;
+}
+
+.chat-input:focus {
+  outline: none;
+}
+
+.send-button {
+  background: #0077ff;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  padding: 12px 24px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+
+.login-header {
+  background-color: #0077ff;
+  color: white;
+  padding: 30px 20px;
   text-align: center;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.login-header h2 {
+  font-size: 24px;
+  font-weight: 500;
+  margin-bottom: 8px;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
+.login-header p {
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+.login-form {
+  padding: 24px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  color: #333;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  background: #f0f2f5;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.form-group input:focus {
+  outline: none;
+  background: #e4e8ed;
+}
+
+.error-message {
+  background: #ffebee;
+  color: #d32f2f;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.login-button {
+  width: 100%;
+  background: #0077ff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.login-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .card {
+    border-radius: 16px;
   }
-  to {
-    transform: rotate(360deg);
+  
+  .chat-container,
+  .login-container {
+    max-width: 100%;
   }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
+  
+  .chat-input {
+    padding: 10px 16px;
   }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
+  
+  .send-button {
+    padding: 10px 20px;
+  }
 }

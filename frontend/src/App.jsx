@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./auth/Login";
 import ChatInterface from "./components/Chatinterface";
+import './app.css';
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false); // Authentication state
