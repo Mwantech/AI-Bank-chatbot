@@ -26,8 +26,6 @@ class NLPService:
         self.base_path = Path(os.path.abspath(os.path.dirname(__file__))).parent
         self.cache_file = self.base_path / 'data' / 'response_cache.pkl'
         self.model_dir = self.base_path / model_dir
-        self.cache_duration = timedelta(hours=24)
-        self.conversation_context = {}
         
         # Set up logging
         logging.basicConfig(
@@ -36,22 +34,23 @@ class NLPService:
         )
         self.logger = logging.getLogger(__name__)
         
-        # Initialize components
+        # Initialize basic components
         self.initialize_components()
+        
+        # Create necessary directories
         self.setup_directories()
         
-        # Initialize basic training data
-        self.initialize_training_data()
-        
-        # Load cache
-        self.load_cache()
+        # Load models and cache
+        self.load_model()
+        self.initialize_cache()
 
     def initialize_components(self) -> None:
         """Initialize NLP components"""
         try:
             self.lemmatizer = WordNetLemmatizer()
-            # Convert stopwords to list instead of set
-            self.stop_words = list(stopwords.words('english'))
+            self.stop_words = list(set(stopwords.words('english')))  # Convert set to list
+            self.cache_duration = timedelta(hours=24)
+            self.conversation_context = {}
             
             # Load spaCy model
             try:
@@ -75,53 +74,38 @@ class NLPService:
             self.logger.error(f"Error setting up directories: {str(e)}")
             raise
 
-    def initialize_training_data(self) -> None:
-        """Initialize basic training data and vectorizer"""
+    def load_model(self) -> None:
+        """Load the trained model components safely"""
         try:
-            # Basic initial training data
-            self.intents = {
-                'intents': {
-                    'greeting': {
-                        'patterns': ['hello', 'hi', 'hey', 'good morning', 'good afternoon'],
-                        'responses': ['Hello! How can I help you today?', 'Hi there! How may I assist you?']
-                    },
-                    'farewell': {
-                        'patterns': ['goodbye', 'bye', 'see you', 'see you later'],
-                        'responses': ['Goodbye! Have a great day!', 'Bye! Take care!']
-                    },
-                    'fallback': {
-                        'patterns': [],
-                        'responses': ["I'm not quite sure I understood. Could you please rephrase that?"]
-                    }
-                }
-            }
-
-            # Prepare patterns and classes
-            self.patterns = []
-            self.pattern_classes = []
-            for intent, data in self.intents['intents'].items():
-                for pattern in data.get('patterns', []):
-                    self.patterns.append(pattern)
-                    self.pattern_classes.append(intent)
-
-            # Initialize and fit vectorizer with 'english' stopwords
+            # Initialize new vectorizer
             self.vectorizer = TfidfVectorizer(
                 tokenizer=self.preprocess_text,
-                stop_words='english'  # Use built-in English stopwords
+                stop_words=self.stop_words
             )
-            if self.patterns:
-                self.X = self.vectorizer.fit_transform(self.patterns)
-            else:
-                self.X = None
-                
-            self.logger.info("Training data initialized successfully")
             
+            # Load patterns and intents first
+            with open(self.model_dir / 'patterns.pkl', 'rb') as f:
+                patterns_data = pickle.load(f)
+                self.patterns = patterns_data['patterns']
+                self.pattern_classes = patterns_data['pattern_classes']
+            
+            with open(self.model_dir / 'intents.pkl', 'rb') as f:
+                self.intents = pickle.load(f)
+            
+            # Fit vectorizer on patterns
+            self.X = self.vectorizer.fit_transform(self.patterns)
+            
+            self.logger.info("Model loaded successfully")
+            
+        except FileNotFoundError:
+            self.logger.error("Model files not found. Please ensure model files are present in the models directory")
+            raise
         except Exception as e:
-            self.logger.error(f"Error initializing training data: {str(e)}")
+            self.logger.error(f"Error loading model: {str(e)}")
             raise
 
-    def load_cache(self) -> None:
-        """Load cached responses"""
+    def initialize_cache(self) -> None:
+        """Initialize or load response cache"""
         try:
             if self.cache_file.exists():
                 with open(self.cache_file, 'rb') as f:
@@ -165,13 +149,6 @@ class NLPService:
             Dict[str, Any]: Response containing intent, response text, and confidence
         """
         try:
-            if not self.patterns or self.X is None:
-                return {
-                    'intent': 'fallback',
-                    'response': "I'm still learning. Please try again later.",
-                    'confidence': 0.0
-                }
-
             # Process input
             processed_text = self.preprocess_text(text)
             input_vector = self.vectorizer.transform([processed_text])
@@ -185,11 +162,7 @@ class NLPService:
             intent = self.pattern_classes[most_similar]
             
             if confidence < 0.2:
-                return {
-                    'intent': 'fallback',
-                    'response': "I'm not quite sure I understood. Could you please rephrase that?",
-                    'confidence': 0.0
-                }
+                return self.get_fallback_response()
             
             responses = self.intents['intents'][intent]['responses']
             response = np.random.choice(responses)
@@ -202,8 +175,20 @@ class NLPService:
             
         except Exception as e:
             self.logger.error(f"Error generating response: {str(e)}")
-            return {
-                'intent': 'error',
-                'response': "I apologize, but I'm experiencing technical difficulties.",
-                'confidence': 0.0
-            }
+            return self.get_error_response()
+
+    def get_fallback_response(self) -> Dict[str, Any]:
+        """Generate fallback response for low confidence"""
+        return {
+            'intent': 'fallback',
+            'response': "I'm not quite sure I understood. Could you please rephrase that?",
+            'confidence': 0.0
+        }
+
+    def get_error_response(self) -> Dict[str, Any]:
+        """Generate error response"""
+        return {
+            'intent': 'error',
+            'response': "I apologize, but I'm experiencing technical difficulties.",
+            'confidence': 0.0
+        }
