@@ -3,7 +3,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 from datetime import datetime, timedelta
 import os
-from models.models import db, Users
+from models.models import db, User 
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -23,9 +23,9 @@ def register():
         return jsonify({'error': 'Missing required fields'}), 400
         
     # Check if user already exists
-    existing_user = Users.query.filter(
-        (Users.Email == data['email']) | 
-        (Users.PhoneNumber == data['phoneNumber'])
+    existing_user = User.query.filter(
+    (User.Email == data['email']) | 
+    (User.PhoneNumber == data['phoneNumber'])
     ).first()
     
     if existing_user:
@@ -33,7 +33,7 @@ def register():
     
     try:
         hashed_password = generate_password_hash(data['password'])
-        new_user = Users(
+        new_user = User(
             FirstName=data['firstName'],
             LastName=data['lastName'],
             Email=data['email'],
@@ -68,7 +68,7 @@ def login():
     if not email or not password:
         return jsonify({'error': 'Email and password are required'}), 400
     
-    user = Users.query.filter_by(Email=email).first()
+    user = User.query.filter_by(Email=email).first()
     
     if not user or not check_password_hash(user.PasswordHash, password):
         return jsonify({'error': 'Invalid email or password'}), 401

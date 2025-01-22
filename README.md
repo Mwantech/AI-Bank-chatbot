@@ -35,3 +35,20 @@ your_project/
 │   └── response_cache.pkl
 └── services/
     └── nlp_service.py
+
+
+
+
+api endpoint for registering new user:http://localhost:5000/api/auth/register
+{
+    "firstName": "John",
+    "lastName": "Doe",
+    "email": "john.doe@example.com",
+    "password": "Password123!",
+    "phoneNumber": "1234567890",
+    "dateOfBirth": "1990-01-01",
+    "address": "123 Main St, Springfield",
+    "identificationNumber": "A12345678",
+    "securityQuestion": "What is your favorite color?",
+    "securityAnswer": "Blue"
+}
