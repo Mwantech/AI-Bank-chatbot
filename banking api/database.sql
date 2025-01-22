@@ -12,6 +12,10 @@ CREATE TABLE Users (
     AccountStatus ENUM('Active', 'Inactive') DEFAULT 'Active',
     CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+ALTER TABLE Users 
+ADD COLUMN PasswordHash VARCHAR(255) NOT NULL;
+
 CREATE TABLE Accounts (
     AccountID INT AUTO_INCREMENT PRIMARY KEY,
     UserID INT NOT NULL,

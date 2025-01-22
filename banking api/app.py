@@ -5,12 +5,22 @@ load_dotenv()
 from flask import Flask, send_file
 from config import app, db
 from routes.account_routes import account_bp
+from flask_cors import CORS
 from routes.customer_support_routes import support_bp
 from routes.loan_routes import loan_bp
 from routes.location_routes import location_bp
 from routes.investment_routes import investment_bp
 from routes.chatbot_routes import chatbot_bp
+from routes.auth_routes import auth_bp
 
+# Configure CORS
+CORS(app, resources={
+    r"/api/*": {
+        "origins": ["http://localhost:5173"],
+        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization"]
+    }
+})
 
 
 # Register blueprints
@@ -20,6 +30,7 @@ app.register_blueprint(loan_bp, url_prefix='/api/loans')
 app.register_blueprint(location_bp, url_prefix='/api/locations')
 app.register_blueprint(investment_bp, url_prefix='/api/investments')
 app.register_blueprint(chatbot_bp, url_prefix='/api/chatbot')
+app.register_blueprint(auth_bp, url_prefix='/api/auth')
 
 @app.route('/')
 def index():
