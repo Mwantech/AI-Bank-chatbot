@@ -9,6 +9,7 @@ class User(db.Model):
     LastName = db.Column(db.String(50))
     Email = db.Column(db.String(100), unique=True, nullable=False)
     PhoneNumber = db.Column(db.String(15), unique=True, nullable=False)
+    PasswordHash = db.Column(db.String(255), nullable=False)  # Added password hash field
     DateOfBirth = db.Column(db.Date)
     Address = db.Column(db.Text)
     IdentificationNumber = db.Column(db.String(50))
