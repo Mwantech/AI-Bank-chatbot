@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import axios from "axios";
+import "./ChatInterface.css";
 
 const ChatInterface = () => {
   const [messages, setMessages] = useState([]);
   const [userMessage, setUserMessage] = useState("");
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
@@ -12,125 +14,68 @@ const ChatInterface = () => {
 
     if (!userMessage.trim()) return;
 
-    // Add user message to the chat
     setMessages((prev) => [...prev, { sender: "user", text: userMessage }]);
     setUserMessage("");
+    setIsLoading(true);
 
     try {
-      const response = await axios.post("http://your-backend-url/api/chat", {
+      const response = await axios.post("http://localhost:5000/api/chatbot/chat", {
         message: userMessage,
       });
 
-      // Add bot response to the chat
-      setMessages((prev) => [...prev, { sender: "bot", text: response.data.reply }]);
+      const botMessage = response.data.response || response.data.reply || "I couldn't process that request.";
+      setMessages((prev) => [...prev, { sender: "bot", text: botMessage }]);
     } catch (error) {
       console.error("Error fetching chatbot response:", error);
       setError("Unable to connect to the chatbot. Please try again later.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div style={styles.container}>
-      <div style={styles.chatBox}>
-        <h2 style={styles.title}>Bank Chatbot</h2>
-        <div style={styles.messagesContainer}>
+    <div className="chat-container">
+      <div className="chat-box">
+        <div className="chat-header">
+          <h2>Bank Chatbot</h2>
+        </div>
+        
+        <div className="messages-container">
           {messages.map((message, index) => (
-            <div
-              key={index}
-              style={{
-                ...styles.message,
-                alignSelf: message.sender === "user" ? "flex-end" : "flex-start",
-                backgroundColor: message.sender === "user" ? "#007bff" : "#f1f1f1",
-                color: message.sender === "user" ? "#ffffff" : "#000000",
-              }}
-            >
-              {message.text}
+            <div key={index} className={`message ${message.sender}`}>
+              <div className="message-content">
+                {message.text}
+              </div>
             </div>
           ))}
+          {isLoading && (
+            <div className="message bot">
+              <div className="message-content typing">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+          )}
         </div>
-        {error && <p style={styles.error}>{error}</p>}
-        <form onSubmit={handleSendMessage} style={styles.inputForm}>
+
+        {error && <div className="error-message">{error}</div>}
+
+        <form onSubmit={handleSendMessage} className="chat-input-form">
           <input
             type="text"
             value={userMessage}
             onChange={(e) => setUserMessage(e.target.value)}
             placeholder="Type your message..."
-            style={styles.input}
+            className="chat-input"
           />
-          <button type="submit" style={styles.button}>
+          <button type="submit" className="send-button" disabled={isLoading}>
             Send
           </button>
         </form>
       </div>
     </div>
   );
-};
-
-const styles = {
-  container: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    height: "100vh",
-    backgroundColor: "#f4f6f9",
-  },
-  chatBox: {
-    width: "600px",
-    height: "80vh",
-    borderRadius: "10px",
-    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-    backgroundColor: "#ffffff",
-    display: "flex",
-    flexDirection: "column",
-  },
-  title: {
-    textAlign: "center",
-    padding: "15px",
-    borderBottom: "1px solid #cccccc",
-    fontSize: "18px",
-    fontWeight: "bold",
-    backgroundColor: "#007bff",
-    color: "#ffffff",
-  },
-  messagesContainer: {
-    flex: 1,
-    padding: "15px",
-    overflowY: "auto",
-  },
-  message: {
-    maxWidth: "70%",
-    padding: "10px",
-    borderRadius: "10px",
-    marginBottom: "10px",
-    fontSize: "14px",
-  },
-  inputForm: {
-    display: "flex",
-    padding: "10px",
-    borderTop: "1px solid #cccccc",
-  },
-  input: {
-    flex: 1,
-    padding: "10px",
-    borderRadius: "5px",
-    border: "1px solid #cccccc",
-    fontSize: "14px",
-  },
-  button: {
-    marginLeft: "10px",
-    padding: "10px 20px",
-    border: "none",
-    borderRadius: "5px",
-    backgroundColor: "#007bff",
-    color: "#ffffff",
-    cursor: "pointer",
-    fontSize: "14px",
-  },
-  error: {
-    color: "#ff4d4d",
-    padding: "10px",
-    textAlign: "center",
-  },
 };
 
 export default ChatInterface;
