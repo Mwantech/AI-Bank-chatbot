@@ -1,6 +1,7 @@
+
 import React, { useState } from "react";
 import axios from "axios";
-
+import styles from '../styles.module.css';
 
 const Login = ({ onLoginSuccess }) => {
   const [email, setEmail] = useState("");
@@ -36,15 +37,15 @@ const Login = ({ onLoginSuccess }) => {
   };
 
   return (
-    <div className="login-container">
-      <div className="login-card">
-        <div className="login-header">
+    <div className={styles['login-container']}>
+      <div className={styles['login-card']}>
+        <div className={styles['login-header']}>
           <h2>Welcome Back</h2>
           <p>Please login to your account</p>
         </div>
         
-        <form onSubmit={handleSubmit} className="login-form">
-          <div className="form-group">
+        <form onSubmit={handleSubmit} className={styles['login-form']}>
+          <div className={styles['form-group']}>
             <label>Email</label>
             <input
               type="email"
@@ -55,7 +56,7 @@ const Login = ({ onLoginSuccess }) => {
             />
           </div>
 
-          <div className="form-group">
+          <div className={styles['form-group']}>
             <label>Password</label>
             <input
               type="password"
@@ -66,11 +67,11 @@ const Login = ({ onLoginSuccess }) => {
             />
           </div>
 
-          {error && <div className="error-message">{error}</div>}
+          {error && <div className={styles['error-message']}>{error}</div>}
 
-          <button type="submit" className="login-button" disabled={isLoading}>
+          <button type="submit" className={styles['login-button']} disabled={isLoading}>
             {isLoading ? (
-              <div className="loading-spinner"></div>
+              <div className={styles['loading-spinner']}></div>
             ) : (
               "Login"
             )}

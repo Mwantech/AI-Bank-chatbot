@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-
+import styles from './Chatinterface.module.css';
 
 const ChatInterface = () => {
   const [messages, setMessages] = useState([]);
@@ -34,23 +34,23 @@ const ChatInterface = () => {
   };
 
   return (
-    <div className="chat-container">
-      <div className="chat-box">
-        <div className="chat-header">
+    <div className={styles['chat-container']}>
+      <div className={styles['chat-box']}>
+        <div className={styles['chat-header']}>
           <h2>Bank Chatbot</h2>
         </div>
         
-        <div className="messages-container">
+        <div className={styles['messages-container']}>
           {messages.map((message, index) => (
-            <div key={index} className={`message ${message.sender}`}>
-              <div className="message-content">
+            <div key={index} className={`${styles['message']} ${styles[message.sender]}`}>
+              <div className={styles['message-content']}>
                 {message.text}
               </div>
             </div>
           ))}
           {isLoading && (
-            <div className="message bot">
-              <div className="message-content typing">
+            <div className={`${styles['message']} ${styles['bot']}`}>
+              <div className={`${styles['message-content']} ${styles['typing']}`}>
                 <span></span>
                 <span></span>
                 <span></span>
@@ -59,17 +59,17 @@ const ChatInterface = () => {
           )}
         </div>
 
-        {error && <div className="error-message">{error}</div>}
+        {error && <div className={styles['error-message']}>{error}</div>}
 
-        <form onSubmit={handleSendMessage} className="chat-input-form">
+        <form onSubmit={handleSendMessage} className={styles['chat-input-form']}>
           <input
             type="text"
             value={userMessage}
             onChange={(e) => setUserMessage(e.target.value)}
             placeholder="Type your message..."
-            className="chat-input"
+            className={styles['chat-input']}
           />
-          <button type="submit" className="send-button" disabled={isLoading}>
+          <button type="submit" className={styles['send-button']} disabled={isLoading}>
             Send
           </button>
         </form>
