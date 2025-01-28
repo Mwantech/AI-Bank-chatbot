@@ -1,4 +1,4 @@
-
+// Login.jsx 
 import React, { useState } from "react";
 import axios from "axios";
 import styles from '../styles.module.css';
@@ -21,7 +21,24 @@ const Login = ({ onLoginSuccess }) => {
       });
 
       if (response.status === 200) {
-        onLoginSuccess();
+        const { token, user } = response.data;
+        
+        // Store token and user info in localStorage
+        localStorage.setItem('authToken', token);
+        localStorage.setItem('userId', user.id);
+        localStorage.setItem('userEmail', user.email);
+        
+        // Configure axios defaults for future requests
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        
+        // Pass the user data to parent component
+        onLoginSuccess({
+          token,
+          userId: user.id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName
+        });
       }
     } catch (err) {
       if (err.response?.status === 401) {
@@ -81,5 +98,7 @@ const Login = ({ onLoginSuccess }) => {
     </div>
   );
 };
+
+
 
 export default Login;

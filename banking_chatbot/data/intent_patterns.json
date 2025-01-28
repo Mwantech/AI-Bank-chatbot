@@ -1,0 +1,225 @@
+{
+    "intents": {
+        "balance_inquiry": {
+            "patterns": [
+                "what is my balance",
+                "check balance",
+                "account balance",
+                "how much money do i have",
+                "show me my balance",
+                "what's left in my account",
+                "current balance please",
+                "balance check",
+                "remaining balance",
+                "available funds",
+                "how much is in my account",
+                "can you tell me my balance",
+                "what's my current balance",
+                "balance inquiry",
+                "check my account"
+            ],
+            "responses": [
+                "I'll help you check your account balance. Please wait while I fetch that information.",
+                "Let me retrieve your current balance for you.",
+                "I'll look up your account balance right away.",
+                "I'll check your available balance now.",
+                "Let me fetch your current account status."
+            ]
+        },
+        "transfer_money": {
+            "patterns": [
+                "transfer money",
+                "send money",
+                "make a payment",
+                "pay someone",
+                "wire transfer",
+                "move funds",
+                "transfer funds to another account",
+                "send payment to",
+                "i need to pay",
+                "transfer to my friend",
+                "send money to another bank",
+                "domestic transfer",
+                "international wire transfer",
+                "quick transfer",
+                "move money between accounts",
+                "transfer to savings",
+                "transfer to checking"
+            ],
+            "responses": [
+                "I'll help you transfer money. Please provide the recipient's details.",
+                "I can assist you with making a transfer. Who would you like to send money to?",
+                "Let's process that transfer for you. I'll need some details first.",
+                "I'll help you send money. Could you specify the recipient and amount?",
+                "Sure, I can help with the transfer. Would this be domestic or international?"
+            ]
+        },
+        "loan_inquiry": {
+            "patterns": [
+                "need a loan",
+                "loan application",
+                "borrow money",
+                "loan status",
+                "apply for loan",
+                "what's my loan balance",
+                "loan interest rates",
+                "personal loan",
+                "home loan",
+                "car loan",
+                "education loan",
+                "loan eligibility",
+                "loan requirements",
+                "how much can i borrow",
+                "loan payment schedule",
+                "loan emi calculator",
+                "refinance options",
+                "loan terms and conditions"
+            ],
+            "responses": [
+                "I can help you with loan-related inquiries. What specific information do you need?",
+                "Let me assist you with your loan request. What type of loan are you interested in?",
+                "I'll help you with your loan application. What amount are you looking to borrow?",
+                "I can guide you through our loan options. What would the loan be for?",
+                "Let me check our current loan offerings. What's your preferred loan duration?"
+            ]
+        },
+        "customer_support": {
+            "patterns": [
+                "need help",
+                "support required",
+                "having issues",
+                "problem with",
+                "cant access",
+                "forgot password",
+                "account locked",
+                "card blocked",
+                "suspicious transaction",
+                "update personal information",
+                "change phone number",
+                "change address",
+                "dispute a charge",
+                "wrong transaction",
+                "technical problem",
+                "app not working",
+                "website issues",
+                "error message"
+            ],
+            "responses": [
+                "I'm here to help. Could you describe the issue you're experiencing?",
+                "I'll assist you with your concern. What seems to be the problem?",
+                "Let me help you resolve this issue. Can you provide more details?",
+                "I understand you're having trouble. Could you explain what's happening?",
+                "I'm sorry you're experiencing issues. Let's sort this out together."
+            ]
+        },
+        "investment_info": {
+            "patterns": [
+                "investment options",
+                "mutual funds",
+                "fixed deposit",
+                "invest money",
+                "investment plans",
+                "stock trading",
+                "retirement planning",
+                "portfolio management",
+                "investment advice",
+                "best investment options",
+                "risk assessment",
+                "return on investment",
+                "market performance",
+                "investment calculator",
+                "long term investment",
+                "short term investment",
+                "wealth management",
+                "open trading account"
+            ],
+            "responses": [
+                "I can guide you through our investment options. What type of investment interests you?",
+                "Let me show you our available investment plans. What's your investment goal?",
+                "I'll help you explore investment opportunities. What's your preferred investment duration?",
+                "Let's find the right investment strategy for you. What's your risk tolerance?",
+                "I can explain our investment products. Are you looking for short-term or long-term investments?"
+            ]
+        },
+        "location_search": {
+            "patterns": [
+                "find atm",
+                "nearest branch",
+                "bank location",
+                "closest atm",
+                "branch address",
+                "atm near me",
+                "where is the nearest branch",
+                "24 hour atm",
+                "weekend branch",
+                "branch timing",
+                "atm with deposit",
+                "branch working hours",
+                "drive through atm",
+                "international atm",
+                "branch phone number",
+                "branch manager contact"
+            ],
+            "responses": [
+                "I'll help you find the nearest location. Could you share your current location?",
+                "Let me locate the closest branch/ATM for you. Where are you currently?",
+                "I can help you find nearby banking facilities. What's your location?",
+                "I'll find the nearest banking location for you. Which city are you in?",
+                "Let me search for banking facilities in your area. Could you provide your zip code?"
+            ]
+        },
+        "card_services": {
+            "patterns": [
+                "credit card application",
+                "debit card issues",
+                "replace card",
+                "lost card",
+                "stolen card",
+                "card activation",
+                "change card pin",
+                "card limits",
+                "international usage",
+                "card benefits",
+                "reward points",
+                "credit limit increase",
+                "card statement",
+                "card declined",
+                "contactless payment",
+                "card delivery status"
+            ],
+            "responses": [
+                "I'll help you with your card-related request. What specific assistance do you need?",
+                "Let me assist you with your card inquiry. Could you provide more details?",
+                "I can help with your card services. What seems to be the issue?",
+                "I'll guide you through our card services. What would you like to know?",
+                "Let's address your card concerns. Could you explain what you need help with?"
+            ]
+        },
+        "account_security": {
+            "patterns": [
+                "secure my account",
+                "change password",
+                "suspicious activity",
+                "unauthorized transaction",
+                "security settings",
+                "two factor authentication",
+                "login issues",
+                "account access",
+                "reset password",
+                "biometric login",
+                "security questions",
+                "device verification",
+                "trusted devices",
+                "recent logins",
+                "account alerts"
+            ],
+            "responses": [
+                "Your security is our priority. How can I help protect your account?",
+                "I'll help you secure your account. What security feature would you like to manage?",
+                "Let's ensure your account is protected. What security concern do you have?",
+                "I can help you with account security. What specific measure would you like to set up?",
+                "I'll assist you with security settings. What would you like to update?"
+            ]
+        }
+    }
+}
