@@ -1,0 +1,5 @@
+.env
+models
+__pycache__
+instance
+generate_secret_key.py

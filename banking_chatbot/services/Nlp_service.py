@@ -645,6 +645,45 @@ class BankingNLPService:
         except Exception as e:
             self.logger.error(f"Transaction inquiry error: {str(e)}")
             return self._generate_response('error', context)
+    
+    def _process_transaction_selection(self, user_id: int, text: str, state: Dict) -> Dict[str, Any]:
+        """Process transaction history selection"""
+        try:
+            accounts = state['context'].get('accounts', [])
+            idx = int(text) - 1
+            
+            if 0 <= idx < len(accounts):
+                selected_account = accounts[idx]
+                state['awaiting_response'] = False
+                state['last_question'] = None
+                
+                # Simulate getting recent transactions
+                response = f"Recent transactions for your {selected_account['account_type'].title()} Account:\n"
+                response += "1. No actual transaction data available in this example\n"
+                response += "Would you like to:\n"
+                response += "1. View more transactions\n"
+                response += "2. Download statement\n"
+                response += "3. Search transactions"
+                
+                return {
+                    'intent': 'transaction_inquiry',
+                    'response': response,
+                    'account': selected_account,
+                    'suggested_actions': ['view_more', 'download_statement', 'search_transactions']
+                }
+            else:
+                return {
+                    'intent': 'transaction_inquiry',
+                    'response': "Please select a valid account number.",
+                    'suggested_actions': ['select_account', 'view_all_transactions']
+                }
+                
+        except ValueError:
+            return {
+                'intent': 'transaction_inquiry',
+                'response': "Please select a valid account number.",
+                'suggested_actions': ['select_account', 'view_all_transactions']
+            }
 
     def _generate_response(self, intent: str, context: Optional[Dict] = None) -> Dict[str, Any]:
         """Generate a predefined response based on intent and context"""
@@ -709,44 +748,6 @@ class BankingNLPService:
 
         return None
 
-    def _process_transaction_selection(self, user_id: int, text: str, state: Dict) -> Dict[str, Any]:
-        """Process transaction history selection"""
-        try:
-            accounts = state['context'].get('accounts', [])
-            idx = int(text) - 1
-            
-            if 0 <= idx < len(accounts):
-                selected_account = accounts[idx]
-                state['awaiting_response'] = False
-                state['last_question'] = None
-                
-                # Simulate getting recent transactions
-                response = f"Recent transactions for your {selected_account['account_type'].title()} Account:\n"
-                response += "1. No actual transaction data available in this example\n"
-                response += "Would you like to:\n"
-                response += "1. View more transactions\n"
-                response += "2. Download statement\n"
-                response += "3. Search transactions"
-                
-                return {
-                    'intent': 'transaction_inquiry',
-                    'response': response,
-                    'account': selected_account,
-                    'suggested_actions': ['view_more', 'download_statement', 'search_transactions']
-                }
-            else:
-                return {
-                    'intent': 'transaction_inquiry',
-                    'response': "Please select a valid account number.",
-                    'suggested_actions': ['select_account', 'view_all_transactions']
-                }
-                
-        except ValueError:
-            return {
-                'intent': 'transaction_inquiry',
-                'response': "Please select a valid account number.",
-                'suggested_actions': ['select_account', 'view_all_transactions']
-            }
 
     def _extract_amount(self, text: str) -> Optional[float]:
         """Extract amount from text"""

@@ -1,4 +1,3 @@
-// Login.jsx 
 import React, { useState } from "react";
 import axios from "axios";
 import styles from '../styles.module.css';
@@ -20,34 +19,37 @@ const Login = ({ onLoginSuccess }) => {
         password,
       });
 
-      if (response.status === 200) {
+      if (response.data?.token && response.data?.user) {
         const { token, user } = response.data;
         
-        // Store token and user info in localStorage
-        localStorage.setItem('authToken', token);
-        localStorage.setItem('userId', user.id);
-        localStorage.setItem('userEmail', user.email);
+        // Store token in localStorage
+        localStorage.setItem('authToken', `Bearer ${token}`);
         
         // Configure axios defaults for future requests
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         
-        // Pass the user data to parent component
+        // Pass complete user data to parent
         onLoginSuccess({
           token,
-          userId: user.id,
+          id: user.id,
           email: user.email,
           firstName: user.firstName,
           lastName: user.lastName
         });
+      } else {
+        throw new Error('Invalid response from server');
       }
     } catch (err) {
       if (err.response?.status === 401) {
-        setError("Invalid email or password. Please try again.");
+        setError("Invalid email or password");
+      } else if (err.response?.status === 403) {
+        setError("Account is inactive");
       } else if (err.response?.status === 500) {
-        setError("Server error. Please try again later.");
+        setError("Server error");
       } else {
-        setError("An unexpected error occurred. Please check your connection.");
+        setError(err.message || "Login failed");
       }
+      console.error('Login error:', err);
     } finally {
       setIsLoading(false);
     }
@@ -70,6 +72,7 @@ const Login = ({ onLoginSuccess }) => {
               onChange={(e) => setEmail(e.target.value)}
               required
               placeholder="Enter your email"
+              disabled={isLoading}
             />
           </div>
 
@@ -81,12 +84,17 @@ const Login = ({ onLoginSuccess }) => {
               onChange={(e) => setPassword(e.target.value)}
               required
               placeholder="Enter your password"
+              disabled={isLoading}
             />
           </div>
 
           {error && <div className={styles['error-message']}>{error}</div>}
 
-          <button type="submit" className={styles['login-button']} disabled={isLoading}>
+          <button 
+            type="submit" 
+            className={styles['login-button']} 
+            disabled={isLoading || !email || !password}
+          >
             {isLoading ? (
               <div className={styles['loading-spinner']}></div>
             ) : (
@@ -98,7 +106,5 @@ const Login = ({ onLoginSuccess }) => {
     </div>
   );
 };
-
-
 
 export default Login;

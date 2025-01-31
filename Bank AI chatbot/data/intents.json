@@ -1,0 +1,351 @@
+{
+  "intents": [
+    {
+      "intent": "greeting",
+      "patterns": [
+        "Hi",
+        "Hello",
+        "Hey there",
+        "Good morning",
+        "Good afternoon",
+        "Good evening",
+        "Hi, I need help with my account",
+        "Hello, can you assist me?",
+        "Hey, I have a question about banking",
+        "Hi there, I'm having trouble with my account",
+        "Hello, is someone available to help?",
+        "Hi, I'm a new customer"
+      ],
+      "responses": [
+        "Hello! How can I assist you with your banking needs today?",
+        "Hi there! I'm here to help with your banking questions.",
+        "Welcome! What can I help you with today?",
+        "Hello! I'm your banking assistant. How may I help you?"
+      ]
+    },
+    {
+      "intent": "goodbye",
+      "patterns": [
+        "Bye",
+        "See you later",
+        "Goodbye",
+        "Thanks, bye",
+        "Have a good day",
+        "That's all I needed",
+        "Thanks for your help",
+        "I'm done for now",
+        "Talk to you later",
+        "Thanks for the assistance"
+      ],
+      "responses": [
+        "Goodbye! Have a great day!",
+        "Thank you for banking with us. Have a wonderful day!",
+        "Thanks for chatting! Let us know if you need anything else.",
+        "Goodbye! Feel free to return if you have more questions."
+      ]
+    },
+    {
+      "intent": "account_balance",
+      "patterns": [
+        "What's my current balance?",
+        "How much money do I have in my account?",
+        "Can you tell me my account balance?",
+        "Show me my {account_type} balance",
+        "Balance inquiry for account ending in {last_4_digits}",
+        "What's the available balance in my {account_type} account?",
+        "How much is left in my account?",
+        "Current balance please",
+        "I need to check my {account_type} account balance",
+        "Tell me how much I have in my account ending {last_4_digits}",
+        "What's my available balance?",
+        "Could you check my balance in all accounts?",
+        "Balance check for my {account_type} account please",
+        "I want to know how much money I have",
+        "Can you show me all my account balances?",
+        "What's my current {account_type} balance?"
+      ],
+      "responses": [
+        "For security reasons, I cannot directly show your balance. Here's how to check your balance:\n1. Log into your online banking account\n2. Navigate to the 'Accounts' section\n3. Select your account to view the balance\n\nAlternatively, you can:\n- Use our mobile banking app\n- Visit the nearest branch\n- Call our customer service at 1-800-XXX-XXXX",
+        "To protect your account security, I cannot display your balance directly. You can check your balance through:\n- Online banking\n- Mobile app\n- ATM\n- Branch visit\n- Phone banking",
+        "For account security, please check your balance through our secure channels:\n- Online banking portal\n- Mobile banking app\n- Visit a branch\n- Use an ATM\n- Contact customer service"
+      ]
+    },
+    {
+      "intent": "transaction_history",
+      "patterns": [
+        "Show my recent transactions",
+        "I need to see my transaction history",
+        "What transactions have I made recently?",
+        "Show me my last {number} transactions",
+        "Get my transaction history for {time_period}",
+        "Can I see my spending for {month}?",
+        "List all transactions between {start_date} and {end_date}",
+        "Show my pending transactions",
+        "I don't recognize a transaction from {merchant_name}",
+        "Where did I spend money last {time_period}?",
+        "Show me all transactions above ${amount}",
+        "What did I spend at {merchant_name}?",
+        "I need to see all my {category} purchases",
+        "Find transactions from {merchant_name}",
+        "Show me withdrawals from last {time_period}",
+        "What bills were paid this {month}?",
+        "Display my recurring transactions",
+        "Search for purchases at {merchant_name}"
+      ],
+      "responses": [
+        "You can view your transaction history through these secure methods:\n1. Log into online banking\n2. Go to 'Transaction History'\n3. Select the desired time period\n\nAlternatively:\n- Use our mobile app\n- Request a statement at a branch\n- Call customer service",
+        "For security, please access your transaction history through:\n- Online banking portal\n- Mobile banking app\n- Branch visit\n- Monthly statement"
+      ]
+    },
+    {
+      "intent": "fund_transfer",
+      "patterns": [
+        "I want to transfer money",
+        "How do I send money to another account?",
+        "Transfer ${amount} to {recipient}",
+        "Move money between accounts",
+        "Send money to account number {account_number}",
+        "Make a transfer to {recipient_name}",
+        "Schedule a transfer for {date}",
+        "Set up recurring transfers",
+        "I need to wire money to {recipient_name}",
+        "How do I send money internationally?",
+        "Can I transfer money to someone without their account number?",
+        "Set up automatic transfers every {time_period}",
+        "Transfer money to my {account_type} account",
+        "Send ${amount} to {phone_number}",
+        "Quick transfer to {recipient_name}",
+        "Move funds between my accounts",
+        "International wire to {country}",
+        "Setup bill pay for {payee_name}"
+      ],
+      "responses": [
+        "To make a secure transfer, please:\n1. Log into online banking\n2. Select 'Transfer Money'\n3. Choose accounts and enter amount\n4. Verify and confirm\n\nAlternatively:\n- Use our mobile app\n- Visit a branch\n- Call customer service",
+        "For your security, please make transfers through:\n- Online banking\n- Mobile app\n- Branch visit\n- Phone banking"
+      ]
+    },
+    {
+      "intent": "bill_payment",
+      "patterns": [
+        "I need to pay a bill",
+        "How do I set up bill pay?",
+        "Pay my {utility_type} bill",
+        "Schedule a payment for {payee_name}",
+        "Setup automatic bill payments",
+        "When is my next bill payment due?",
+        "Change my bill pay settings",
+        "Cancel a scheduled payment",
+        "View my upcoming bills",
+        "Add a new payee to bill pay",
+        "How long does bill pay take?",
+        "Is my {utility_type} bill payment confirmed?",
+        "Show all my registered billers",
+        "Pay multiple bills at once",
+        "Schedule recurring bill payments"
+      ],
+      "required_entities": ["payee_name", "amount"],
+      "responses": [
+        "I can help you set up bill payment. Here are your options:",
+        "Let me assist you with your bill payment needs.",
+        "Here's how to manage your bill payments:"
+      ]
+    },
+    {
+      "intent": "report_issue",
+      "patterns": [
+        "There's a problem with my account",
+        "I'm having trouble logging in",
+        "My card isn't working",
+        "Error message when trying to {action}",
+        "Can't access my account",
+        "Mobile app isn't working",
+        "Website is down",
+        "ATM ate my card",
+        "Transaction failed but money was taken",
+        "Double charged for purchase",
+        "Login error on mobile app",
+        "Password reset not working",
+        "Account shows wrong balance",
+        "Unable to make payments",
+        "Online banking is slow"
+      ],
+      "required_entities": ["issue_type"],
+      "responses": [
+        "I understand you're having an issue. Let me help you resolve this.",
+        "I'm sorry you're experiencing problems. Let's fix this together.",
+        "Thank you for reporting this issue. Here's what we can do:"
+      ]
+    },
+    {
+      "intent": "atm_location",
+      "patterns": [
+        "Where's the nearest ATM?",
+        "Find ATM locations near me",
+        "ATM in {location}",
+        "Where can I withdraw money?",
+        "Is there an ATM near {address}?",
+        "Show me ATMs in my area",
+        "24-hour ATM locations",
+        "ATMs that accept deposits",
+        "Find ATMs within {distance} miles",
+        "Where's the closest drive-through ATM?",
+        "ATMs near {landmark}",
+        "Show wheelchair accessible ATMs",
+        "Find ATMs that dispense {currency_type}",
+        "Deposit-taking ATMs near {location}",
+        "Are there any ATMs open now?",
+        "ATM locations accepting cash deposits",
+        "Find ATMs with no surcharge",
+        "Partner ATMs near {location}",
+        "Show me all ATMs in {zip_code}",
+        "International ATM locations"
+      ],
+      "required_entities": ["location", "service_type"],
+      "responses": [
+        "I found {count} ATMs near {location}",
+        "Here are the closest ATMs to you:",
+        "Let me show you the nearest ATM locations"
+      ]
+    },
+    {
+      "intent": "account_activation",
+      "patterns": [
+        "How do I activate my account?",
+        "Activate my new card",
+        "Help me set up my online banking",
+        "Enable my {account_type} account",
+        "My account is inactive",
+        "Need to activate my new debit card",
+        "Start using my new credit card",
+        "Account activation process",
+        "How do I get started with my new account?",
+        "Activate my card ending in {last_4_digits}",
+        "Set up mobile banking access",
+        "First time login to online banking",
+        "Initialize my {account_type} account",
+        "Verify my new account",
+        "Activate joint account",
+        "Enable online access for business account",
+        "Set up biometric login",
+        "Register for digital banking",
+        "Activate international transactions",
+        "Enable contactless payments"
+      ],
+      "required_entities": ["account_type", "card_number"],
+      "responses": [
+        "I'll help you activate your {account_type} account. Please confirm your card number ending in {card_last_4}",
+        "Let's get your {account_type} account activated. I'll need to verify your card ending in {card_last_4}",
+        "I can help activate your {account_type} account with card number ending {card_last_4}"
+      ]
+    },
+    {
+      "intent": "account_deactivation",
+      "patterns": [
+        "How do I close my account?",
+        "Deactivate my card",
+        "I want to close my {account_type} account",
+        "Cancel my credit card",
+        "Suspend my account temporarily",
+        "Stop my card from working",
+        "Need to freeze my account",
+        "Close all my accounts",
+        "Temporarily block my card",
+        "Freeze account due to suspicious activity",
+        "Cancel automatic payments and close account",
+        "What's required to close my account?",
+        "Deactivate online banking access",
+        "Remove linked accounts",
+        "Close joint account",
+        "Suspend business account",
+        "Cancel recurring transfers and close account",
+        "Disable international transactions",
+        "Block contactless payments",
+        "Close account after settling balances"
+      ],
+      "required_entities": ["account_type", "reason_code"],
+      "responses": [
+        "I'll help you deactivate your {account_type} account. Reason for closure: {reason_code}",
+        "Let me assist you with closing your {account_type} account. Noted reason: {reason_code}",
+        "I'll process the closure of your {account_type} account. Reason provided: {reason_code}"
+      ]
+    },
+    {
+      "intent": "loan_status",
+      "patterns": [
+        "What's the status of my loan application?",
+        "Has my loan been approved?",
+        "Check my loan application number {application_id}",
+        "When will my loan be processed?",
+        "Updates on my {loan_type} loan application",
+        "Is my loan application still pending?",
+        "Tell me about my loan status",
+        "Has there been any progress with my loan?",
+        "Track my {loan_type} application",
+        "Check eligibility status for {loan_type} loan",
+        "View pending documents for loan",
+        "Status of loan disbursement",
+        "When will I receive my loan decision?",
+        "Check my {loan_type} refinance status",
+        "Loan modification status",
+        "View required documents for loan",
+        "Status of my preapproval",
+        "Check co-signer application status",
+        "Verify loan terms offered",
+        "Track multiple loan applications"
+      ],
+      "required_entities": ["application_id", "loan_type"],
+      "responses": [
+        "Your {loan_type} loan application {application_id} is {status}",
+        "The current status of your loan application is {status}",
+        "Here's what I found about your loan application:"
+      ]
+    },
+    {
+      "intent": "general_banking",
+      "patterns": [
+        "What are your working hours?",
+        "How do I deposit a check?",
+        "What's the current interest rate?",
+        "Do you offer {service_type}?",
+        "How long does {transaction_type} take?",
+        "What documents do I need for {service_type}?",
+        "Explain {banking_term}",
+        "Help with mobile banking",
+        "What's your overdraft policy?",
+        "How do I order new checks?",
+        "Explain wire transfer fees",
+        "What's the minimum balance requirement?",
+        "How do I dispute a transaction?",
+        "Tell me about your savings accounts",
+        "What credit cards do you offer?",
+        "How do I set up direct deposit?",
+        "Explain mortgage rates",
+        "What investment options are available?",
+        "Tell me about business banking services",
+        "How do I change my address?",
+        "What are the foreign transaction fees?",
+        "How to deposit cash?",
+        "Explain your rewards program",
+        "What insurance products do you offer?",
+        "How to get a cashier's check?"
+      ],
+      "responses": [
+        "Here's what you need to know about {topic}:",
+        "Let me explain how {service_type} works",
+        "I can help you understand {banking_term}"
+      ]
+    }
+  ],
+  "entities": {
+    "account_type": ["checking", "savings", "credit", "investment", "retirement", "business"],
+    "reason_code": ["moving_banks", "fees", "service", "temporary_suspension", "fraud", "other"],
+    "service_type": ["deposits", "withdrawals", "transfers", "all"],
+    "incident_type": ["unauthorized_transaction", "lost_card", "stolen_card", "suspicious_activity"],
+    "loan_type": ["personal", "auto", "mortgage", "student", "business", "home_equity"],
+    "transaction_type": ["wire_transfer", "ach", "check_deposit", "international_transfer"],
+    "banking_term": ["apr", "apy", "overdraft", "routing_number", "wire_transfer", "ach", "credit_score"],
+    "currency_type": ["usd", "eur", "gbp", "cad", "jpy"],
+    "distance": ["1", "5", "10", "25", "50"],
+    "application_status": ["pending", "approved", "denied", "under_review", "need_documents"]
+  }
+}

@@ -12,6 +12,7 @@ import sys
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, project_root)
 
+
 from banking_chatbot.routes.auth_routes import auth_bp
 from banking_chatbot.routes.chatbot_routes import chatbot_bp
 

@@ -5,7 +5,6 @@ import jwt
 from datetime import datetime, timedelta
 import os
 import sys
-from banking_chatbot.models.models import User
 
 # Blueprint definitions
 auth_bp = Blueprint('auth', __name__)
