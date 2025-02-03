@@ -28,8 +28,35 @@ class BankingChatbot:
         with open(f'{model_dir}/required_entities.pkl', 'rb') as f:
             self.required_entities = pickle.load(f)
         
+        # Enhanced mapping for entity extraction
+        self.entity_mappings = {
+            'account_activation': {
+                'account_type': ['checking', 'savings', 'credit', 'investment', 'business'],
+                'card_number': r'\d{6,}'
+            },
+            'account_deactivation': {
+                'account_type': ['checking', 'savings', 'credit', 'investment', 'business'],
+                'reason_code': ['suspicious', 'fraud', 'security', 'lost', 'stolen']
+            },
+            'loan_status': {
+                'application_id': r'\d+',
+                'loan_type': ['personal', 'home', 'auto', 'business']
+            }
+        }
+        
         self.context = {}
         self.user_info_collection = {}
+        
+        # Define more explicit intent descriptions
+        self.intent_descriptions = {
+            'account_balance': 'Checking Account Balance',
+            'account_activation': 'Account Activation',
+            'account_deactivation': 'Account Deactivation',
+            'atm_location': 'ATM Location Finder',
+            'loan_status': 'Loan Status Inquiry',
+            'goodbye': 'Ending Conversation',
+            'general_query': 'General Banking Information'
+        }
     
     def preprocess_text(self, text):
         text = text.lower()
@@ -37,24 +64,42 @@ class BankingChatbot:
         doc = self.nlp(text)
         return ' '.join([token.lemma_ for token in doc if not token.is_stop])
     
-    def extract_entities(self, text):
-        doc = self.nlp(text)
+    def extract_entities(self, text, intent=None):
+        """Enhanced entity extraction with intent-specific logic"""
         extracted_entities = {}
         
-        # Extract numbers (for amounts, account numbers)
-        numbers = re.findall(r'\d+', text)
-        if numbers:
-            extracted_entities['number'] = numbers[0]
-            if len(numbers[0]) >= 4:
-                extracted_entities['card_last_4'] = numbers[0][-4:]
+        # If intent is specified, use intent-specific mappings
+        if intent and intent in self.entity_mappings:
+            mappings = self.entity_mappings[intent]
+            
+            # Check account types
+            if 'account_type' in mappings:
+                for account_type in mappings['account_type']:
+                    if account_type in text.lower():
+                        extracted_entities['account_type'] = account_type
+            
+            # Check card numbers or application IDs
+            if 'card_number' in mappings or 'application_id' in mappings:
+                number_pattern = mappings.get('card_number', mappings.get('application_id'))
+                numbers = re.findall(number_pattern, text)
+                if numbers:
+                    key = 'card_number' if 'card_number' in mappings else 'application_id'
+                    extracted_entities[key] = numbers[0]
+            
+            # Check reason codes
+            if 'reason_code' in mappings:
+                for reason in mappings['reason_code']:
+                    if reason in text.lower():
+                        extracted_entities['reason_code'] = reason
+            
+            # Check loan types
+            if 'loan_type' in mappings:
+                for loan_type in mappings['loan_type']:
+                    if loan_type in text.lower():
+                        extracted_entities['loan_type'] = loan_type
         
-        # Extract account types
-        account_types = ['checking', 'savings', 'credit', 'investment', 'retirement', 'business']
-        for word in doc:
-            if word.text.lower() in account_types:
-                extracted_entities['account_type'] = word.text.lower()
-        
-        # Extract dates
+        # Fallback to general extraction
+        doc = self.nlp(text)
         for ent in doc.ents:
             if ent.label_ == 'DATE':
                 extracted_entities['date'] = ent.text
@@ -103,29 +148,66 @@ class BankingChatbot:
         intent_idx = self.classifier.predict(X)[0]
         intent = self.label_encoder.inverse_transform([intent_idx])[0]
         
-        # Extract entities
-        entities = self.extract_entities(text)
+        # Check if there's an ongoing intent from previous interaction
+        if user_id in self.user_info_collection:
+            ongoing_intent = self.user_info_collection[user_id]['intent']
+            ongoing_missing = self.user_info_collection[user_id]['missing_entities']
+            
+            # If there's an ongoing intent, use that for entity extraction
+            if ongoing_missing:
+                entities = self.extract_entities(text, ongoing_intent)
+                
+                # Update user info collection with new entities
+                user_info = self.collect_user_info(user_id, ongoing_intent, entities)
+                
+                # Check if all required entities are now collected
+                if not user_info['missing_entities']:
+                    # Prepare response for the original intent
+                    response_template = random.choice(self.responses[ongoing_intent])
+                    
+                    try:
+                        response = response_template.format(**user_info['collected_entities'])
+                    except KeyError:
+                        response = response_template
+                    
+                    # Clear collected info
+                    del self.user_info_collection[user_id]
+                    
+                    return {
+                        'intent': ongoing_intent,
+                        'intent_description': self.intent_descriptions.get(ongoing_intent, 'Banking Operation'),
+                        'response': response,
+                        'entities': user_info['collected_entities']
+                    }
+                else:
+                    # Still missing some entities
+                    return {
+                        'intent': ongoing_intent,
+                        'intent_description': self.intent_descriptions.get(ongoing_intent, 'Banking Operation'),
+                        'response': f"To proceed with {self.intent_descriptions.get(ongoing_intent, 'this operation')}, I need the following information: {', '.join(user_info['missing_entities'])}",
+                        'missing_entities': user_info['missing_entities']
+                    }
+        
+        # Normal entity extraction for new intent
+        entities = self.extract_entities(text, intent)
+        
+        # Intents that require specific information collection
+        info_collection_intents = [
+            'loan_status', 'account_activation', 
+            'account_deactivation', 'atm_location'
+        ]
         
         # For restricted operations that require user info collection
-        if intent in ['loan_status', 'account_activation', 'account_deactivation', 'atm_location']:
+        if intent in info_collection_intents:
             user_info = self.collect_user_info(user_id, intent, entities)
             
             if user_info['missing_entities']:
                 return {
                     'intent': intent,
-                    'response': f"I need more information. Please provide: {', '.join(user_info['missing_entities'])}",
+                    'intent_description': self.intent_descriptions.get(intent, 'Banking Operation'),
+                    'response': f"To proceed with {self.intent_descriptions.get(intent, 'this operation')}, I need the following information: {', '.join(user_info['missing_entities'])}",
                     'missing_entities': user_info['missing_entities']
                 }
-            
-            # All required info collected, use it for response
-            entities = user_info['collected_entities']
-        else:
-            # For non-restricted operations, provide guidance
-            return {
-                'intent': intent,
-                'response': random.choice(self.responses[intent]),
-                'entities': entities
-            }
         
         # Select and format response
         response_template = random.choice(self.responses[intent])
@@ -141,6 +223,7 @@ class BankingChatbot:
         
         return {
             'intent': intent,
+            'intent_description': self.intent_descriptions.get(intent, 'Banking Operation'),
             'response': response,
             'entities': entities
         }
