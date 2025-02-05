@@ -23,6 +23,7 @@ class User(db.Model):
     
     accounts = db.relationship('Account', backref='user', lazy=True)
     chat_sessions = db.relationship('ChatSession', backref='user', lazy=True)
+    loans = db.relationship('Loan', backref='user', lazy=True)
 
 class Account(db.Model):
     __tablename__ = 'accounts'
@@ -47,6 +48,47 @@ class Transaction(db.Model):
     Description = db.Column(db.String(200))
     Status = db.Column(db.String(20), default='Completed')
     TransactionDate = db.Column(db.DateTime, default=datetime.utcnow)
+
+class Loan(db.Model):
+    __tablename__ = 'loans'
+    
+    LoanID = db.Column(db.Integer, primary_key=True)
+    UserID = db.Column(db.Integer, db.ForeignKey('users.UserID'), nullable=False)
+    ApplicationID = db.Column(db.String(50), unique=True, nullable=False)
+    LoanType = db.Column(db.String(50), nullable=False)  # Personal, Home, Auto, Business
+    RequestedAmount = db.Column(db.Numeric(15, 2), nullable=False)
+    ApprovedAmount = db.Column(db.Numeric(15, 2))
+    InterestRate = db.Column(db.Numeric(5, 2))
+    TermMonths = db.Column(db.Integer)
+    Status = db.Column(db.String(20), default='Pending')  # Pending, Approved, Rejected
+    ApplicationDate = db.Column(db.DateTime, default=datetime.utcnow)
+    ApprovalDate = db.Column(db.DateTime)
+    
+    # Additional loan details
+    Purpose = db.Column(db.String(200))
+    CollateralDetails = db.Column(db.String(200))
+    CreditScore = db.Column(db.Integer)
+
+class ATMLocation(db.Model):
+    __tablename__ = 'atm_locations'
+    
+    LocationID = db.Column(db.Integer, primary_key=True)
+    BranchName = db.Column(db.String(100), nullable=False)
+    Address = db.Column(db.String(200), nullable=False)
+    City = db.Column(db.String(100), nullable=False)
+    State = db.Column(db.String(50), nullable=False)
+    ZipCode = db.Column(db.String(20), nullable=False)
+    Latitude = db.Column(db.Numeric(10, 7))
+    Longitude = db.Column(db.Numeric(10, 7))
+    IsAccessible = db.Column(db.Boolean, default=True)
+    
+    # Additional ATM details
+    WithdrawalLimit = db.Column(db.Numeric(10, 2))
+    OperatingHours = db.Column(db.String(100))
+    AdditionalServices = db.Column(db.String(200))  # e.g., Deposit, Check Balance
+    
+    # Geographical categorization
+    LocationCategory = db.Column(db.String(50))  # Downtown, City Center, Suburban, etc.
 
 class ChatSession(db.Model):
     __tablename__ = 'chat_sessions'

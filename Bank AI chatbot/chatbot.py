@@ -1,9 +1,11 @@
-import pickle
+from typing import Dict, Any, Optional
 import random
-import spacy
-from pathlib import Path
-import re
 from datetime import datetime
+from models import ChatSession, ChatMessage, db
+from inquiry_handler import InquiryHandler
+import pickle
+import spacy
+import re
 
 class BankingChatbot:
     def __init__(self, model_dir='models'):
@@ -28,116 +30,55 @@ class BankingChatbot:
         with open(f'{model_dir}/required_entities.pkl', 'rb') as f:
             self.required_entities = pickle.load(f)
         
-        # Enhanced mapping for entity extraction
+        # Initialize inquiry handler
+        self.inquiry_handler = InquiryHandler(self)
+        
+        # Enhanced mapping for specific inquiries
         self.entity_mappings = {
             'account_activation': {
                 'account_type': ['checking', 'savings', 'credit', 'investment', 'business'],
-                'card_number': r'\d{6,}'
+                'account_number': r'\b\d{10}\b'
             },
             'account_deactivation': {
                 'account_type': ['checking', 'savings', 'credit', 'investment', 'business'],
-                'reason_code': ['suspicious', 'fraud', 'security', 'lost', 'stolen']
+                'reason_code': ['suspicious', 'fraud', 'security', 'lost', 'stolen'],
+                'account_number': r'\b\d{10}\b'
             },
             'loan_status': {
-                'application_id': r'\d+',
+                'application_id': r'APP-\d{5}',
                 'loan_type': ['personal', 'home', 'auto', 'business']
+            },
+            'atm_location': {
+                'location': r'\b(?:in|at)\s+([A-Za-z\s]+)(?:\s|$)'
             }
         }
         
-        self.context = {}
-        self.user_info_collection = {}
-        
-        # Define more explicit intent descriptions
+        # Define intent descriptions
         self.intent_descriptions = {
-            'account_balance': 'Checking Account Balance',
-            'account_activation': 'Account Activation',
-            'account_deactivation': 'Account Deactivation',
+            'account_activation': 'Account Activation Request',
+            'account_deactivation': 'Account Deactivation Request',
+            'loan_status': 'Loan Application Status',
             'atm_location': 'ATM Location Finder',
-            'loan_status': 'Loan Status Inquiry',
-            'goodbye': 'Ending Conversation',
-            'general_query': 'General Banking Information'
+            'general_query': 'General Banking Information',
+            'goodbye': 'End Conversation'
         }
-    
-    def preprocess_text(self, text):
+        
+        # Active sessions storage
+        self.active_sessions: Dict[int, Dict[str, Any]] = {}
+
+    def preprocess_text(self, text: str) -> str:
+        """
+        Preprocess input text
+        """
         text = text.lower()
         text = re.sub(r'[^\w\s]', '', text)
         doc = self.nlp(text)
         return ' '.join([token.lemma_ for token in doc if not token.is_stop])
-    
-    def extract_entities(self, text, intent=None):
-        """Enhanced entity extraction with intent-specific logic"""
-        extracted_entities = {}
-        
-        # If intent is specified, use intent-specific mappings
-        if intent and intent in self.entity_mappings:
-            mappings = self.entity_mappings[intent]
-            
-            # Check account types
-            if 'account_type' in mappings:
-                for account_type in mappings['account_type']:
-                    if account_type in text.lower():
-                        extracted_entities['account_type'] = account_type
-            
-            # Check card numbers or application IDs
-            if 'card_number' in mappings or 'application_id' in mappings:
-                number_pattern = mappings.get('card_number', mappings.get('application_id'))
-                numbers = re.findall(number_pattern, text)
-                if numbers:
-                    key = 'card_number' if 'card_number' in mappings else 'application_id'
-                    extracted_entities[key] = numbers[0]
-            
-            # Check reason codes
-            if 'reason_code' in mappings:
-                for reason in mappings['reason_code']:
-                    if reason in text.lower():
-                        extracted_entities['reason_code'] = reason
-            
-            # Check loan types
-            if 'loan_type' in mappings:
-                for loan_type in mappings['loan_type']:
-                    if loan_type in text.lower():
-                        extracted_entities['loan_type'] = loan_type
-        
-        # Fallback to general extraction
-        doc = self.nlp(text)
-        for ent in doc.ents:
-            if ent.label_ == 'DATE':
-                extracted_entities['date'] = ent.text
-            elif ent.label_ == 'MONEY':
-                extracted_entities['amount'] = ent.text
-            elif ent.label_ == 'GPE':
-                extracted_entities['location'] = ent.text
-        
-        return extracted_entities
-    
-    def collect_user_info(self, user_id, intent, entities):
-        """Handle the collection of required user information"""
-        if user_id not in self.user_info_collection:
-            self.user_info_collection[user_id] = {
-                'intent': intent,
-                'collected_entities': entities,
-                'missing_entities': self.check_required_entities(intent, entities)
-            }
-        else:
-            # Update with any new entities
-            self.user_info_collection[user_id]['collected_entities'].update(entities)
-            self.user_info_collection[user_id]['missing_entities'] = self.check_required_entities(
-                intent,
-                self.user_info_collection[user_id]['collected_entities']
-            )
-        
-        return self.user_info_collection[user_id]
-    
-    def check_required_entities(self, intent, entities):
-        if intent in self.required_entities:
-            missing_entities = []
-            for required_entity in self.required_entities[intent]:
-                if required_entity not in entities:
-                    missing_entities.append(required_entity)
-            return missing_entities
-        return []
-    
-    def get_response(self, text, user_id=None):
+
+    def classify_and_extract(self, text: str) -> Dict[str, Any]:
+        """
+        Classify intent and extract entities from text
+        """
         # Preprocess input text
         processed_text = self.preprocess_text(text)
         
@@ -148,89 +89,207 @@ class BankingChatbot:
         intent_idx = self.classifier.predict(X)[0]
         intent = self.label_encoder.inverse_transform([intent_idx])[0]
         
-        # Check if there's an ongoing intent from previous interaction
-        if user_id in self.user_info_collection:
-            ongoing_intent = self.user_info_collection[user_id]['intent']
-            ongoing_missing = self.user_info_collection[user_id]['missing_entities']
-            
-            # If there's an ongoing intent, use that for entity extraction
-            if ongoing_missing:
-                entities = self.extract_entities(text, ongoing_intent)
-                
-                # Update user info collection with new entities
-                user_info = self.collect_user_info(user_id, ongoing_intent, entities)
-                
-                # Check if all required entities are now collected
-                if not user_info['missing_entities']:
-                    # Prepare response for the original intent
-                    response_template = random.choice(self.responses[ongoing_intent])
-                    
-                    try:
-                        response = response_template.format(**user_info['collected_entities'])
-                    except KeyError:
-                        response = response_template
-                    
-                    # Clear collected info
-                    del self.user_info_collection[user_id]
-                    
-                    return {
-                        'intent': ongoing_intent,
-                        'intent_description': self.intent_descriptions.get(ongoing_intent, 'Banking Operation'),
-                        'response': response,
-                        'entities': user_info['collected_entities']
-                    }
-                else:
-                    # Still missing some entities
-                    return {
-                        'intent': ongoing_intent,
-                        'intent_description': self.intent_descriptions.get(ongoing_intent, 'Banking Operation'),
-                        'response': f"To proceed with {self.intent_descriptions.get(ongoing_intent, 'this operation')}, I need the following information: {', '.join(user_info['missing_entities'])}",
-                        'missing_entities': user_info['missing_entities']
-                    }
-        
-        # Normal entity extraction for new intent
+        # Extract entities based on intent
         entities = self.extract_entities(text, intent)
-        
-        # Intents that require specific information collection
-        info_collection_intents = [
-            'loan_status', 'account_activation', 
-            'account_deactivation', 'atm_location'
-        ]
-        
-        # For restricted operations that require user info collection
-        if intent in info_collection_intents:
-            user_info = self.collect_user_info(user_id, intent, entities)
-            
-            if user_info['missing_entities']:
-                return {
-                    'intent': intent,
-                    'intent_description': self.intent_descriptions.get(intent, 'Banking Operation'),
-                    'response': f"To proceed with {self.intent_descriptions.get(intent, 'this operation')}, I need the following information: {', '.join(user_info['missing_entities'])}",
-                    'missing_entities': user_info['missing_entities']
-                }
-        
-        # Select and format response
-        response_template = random.choice(self.responses[intent])
-        
-        try:
-            response = response_template.format(**entities)
-        except KeyError:
-            response = response_template
-        
-        # Clear collected info after successful response
-        if user_id in self.user_info_collection:
-            del self.user_info_collection[user_id]
         
         return {
             'intent': intent,
-            'intent_description': self.intent_descriptions.get(intent, 'Banking Operation'),
-            'response': response,
             'entities': entities
         }
-    
-    def clear_user_data(self, user_id):
-        """Clear all user-related data"""
-        if user_id in self.user_info_collection:
-            del self.user_info_collection[user_id]
-        if user_id in self.context:
-            del self.context[user_id]
+
+    def extract_entities(self, text: str, intent: str) -> Dict[str, str]:
+        """
+        Extract entities based on intent-specific patterns
+        """
+        entities = {}
+        
+        if intent in self.entity_mappings:
+            mapping = self.entity_mappings[intent]
+            
+            for entity_type, patterns in mapping.items():
+                if isinstance(patterns, list):
+                    # Handle word lists (e.g., account types)
+                    for pattern in patterns:
+                        if pattern in text.lower():
+                            entities[entity_type] = pattern
+                            break
+                else:
+                    # Handle regex patterns
+                    if entity_type == 'location':
+                        # Special handling for location extraction
+                        match = re.search(patterns, text)
+                        if match:
+                            entities[entity_type] = match.group(1)
+                    else:
+                        # General regex matching
+                        match = re.search(patterns, text)
+                        if match:
+                            entities[entity_type] = match.group()
+        
+        # Add general NER entities
+        doc = self.nlp(text)
+        for ent in doc.ents:
+            if ent.label_ in ['DATE', 'MONEY', 'GPE']:
+                entities[ent.label_.lower()] = ent.text
+        
+        return entities
+
+    def get_response(self, text: str, user_id: Optional[int] = None) -> Dict[str, Any]:
+        """
+        Get response for user message with inquiry handling
+        """
+        try:
+            # Get intent and entities
+            analysis = self.classify_and_extract(text)
+            intent = analysis['intent']
+            entities = analysis['entities']
+            
+            # Handle specific inquiries through inquiry handler
+            if intent in ['account_activation', 'account_deactivation', 'loan_status', 'atm_location']:
+                if user_id:
+                    inquiry_response = self.inquiry_handler.handle_inquiry(
+                        user_id, 
+                        text,
+                        intent=intent,
+                        entities=entities
+                    )
+                    
+                    if inquiry_response['status'] != 'error':
+                        return {
+                            'intent': intent,
+                            'intent_description': self.intent_descriptions.get(intent),
+                            'entities': entities,
+                            'response': inquiry_response['message'],
+                            'status': inquiry_response['status'],
+                            'data': inquiry_response.get('data', {})
+                        }
+            
+            # Handle other intents with standard responses
+            response_template = random.choice(self.responses[intent])
+            
+            try:
+                response = response_template.format(**entities)
+            except KeyError:
+                response = response_template
+            
+            return {
+                'intent': intent,
+                'intent_description': self.intent_descriptions.get(intent),
+                'entities': entities,
+                'response': response,
+                'status': 'success'
+            }
+        
+        except Exception as e:
+            return {
+                'status': 'error',
+                'message': f'Error generating response: {str(e)}'
+            }
+
+    def start_session(self, user_id: int) -> Dict[str, Any]:
+        """
+        Start a new chat session for a user
+        """
+        try:
+            # Create new session in database
+            session = ChatSession(
+                UserID=user_id,
+                StartTime=datetime.utcnow(),
+                Status='Active'
+            )
+            db.session.add(session)
+            db.session.commit()
+            
+            # Store session info in memory
+            self.active_sessions[user_id] = {
+                'session_id': session.SessionID,
+                'context': {},
+                'last_intent': None,
+                'last_entities': None
+            }
+            
+            return {
+                'status': 'success',
+                'session_id': session.SessionID,
+                'message': 'Welcome to banking support. How can I help you today?'
+            }
+            
+        except Exception as e:
+            db.session.rollback()
+            return {
+                'status': 'error',
+                'message': 'Error starting chat session'
+            }
+
+    def process_message(self, user_id: int, message: str) -> Dict[str, Any]:
+        """
+        Process incoming message with context management
+        """
+        try:
+            # Check for active session
+            if user_id not in self.active_sessions:
+                return {'status': 'error', 'message': 'No active session found'}
+            
+            session_info = self.active_sessions[user_id]
+            
+            # Get response based on intent and context
+            response = self.get_response(message, user_id)
+            
+            # Save message and response to database
+            chat_message = ChatMessage(
+                SessionID=session_info['session_id'],
+                Message=message,
+                Response=response.get('response', ''),
+                Intent=response.get('intent', ''),
+                Timestamp=datetime.utcnow()
+            )
+            db.session.add(chat_message)
+            db.session.commit()
+            
+            # Update session context
+            session_info['last_intent'] = response.get('intent')
+            session_info['last_entities'] = response.get('entities', {})
+            
+            return response
+            
+        except Exception as e:
+            db.session.rollback()
+            return {
+                'status': 'error',
+                'message': f'Error processing message: {str(e)}'
+            }
+
+    def end_session(self, user_id: int) -> Dict[str, Any]:
+        """
+        End a user's chat session
+        """
+        try:
+            if user_id in self.active_sessions:
+                session_id = self.active_sessions[user_id]['session_id']
+                
+                # Update session in database
+                session = db.session.query(ChatSession).get(session_id)
+                if session:
+                    session.EndTime = datetime.utcnow()
+                    session.Status = 'Completed'
+                    db.session.commit()
+                
+                # Clear session from memory
+                del self.active_sessions[user_id]
+                
+                return {
+                    'status': 'success',
+                    'message': 'Thank you for using our banking support. Have a great day!'
+                }
+            
+            return {
+                'status': 'error',
+                'message': 'No active session found'
+            }
+                
+        except Exception as e:
+            db.session.rollback()
+            return {
+                'status': 'error',
+                'message': 'Error ending chat session'
+            }
