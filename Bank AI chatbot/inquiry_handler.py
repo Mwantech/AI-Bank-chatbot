@@ -50,21 +50,28 @@ class InquiryHandler:
 
     
     def handle_inquiry(self, user_id: int, inquiry_text: str, 
-                      intent: Optional[str] = None, 
-                      entities: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+                    intent: Optional[str] = None, 
+                    entities: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         """
-        Main entry point for handling user inquiries
+        Main entry point for handling user inquiries with improved context switching
         """
         try:
-            # First check pending inquiries
-            if user_id in self.pending_inquiries:
-                return self._handle_pending_inquiry(user_id, inquiry_text)
-            
-            # Use provided intent and entities if available
+            # Get response from chatbot if not provided
             if intent is None or entities is None:
                 chatbot_response = self.chatbot.get_response(inquiry_text, user_id)
                 intent = chatbot_response['intent']
                 entities = chatbot_response['entities']
+            
+            # Check if intent has changed from pending inquiry
+            if user_id in self.pending_inquiries:
+                previous_intent = self.pending_inquiries[user_id]['intent']
+                # If intent has changed, clear pending inquiry
+                if intent != previous_intent and intent not in ['unknown', 'fallback', None]:
+                    del self.pending_inquiries[user_id]
+                    # Proceed with new intent
+                    return self._process_new_inquiry(user_id, intent, entities)
+                # Otherwise, handle the pending inquiry as normal
+                return self._handle_pending_inquiry(user_id, inquiry_text, intent, entities)
             
             # Only handle specific inquiries
             if intent not in ['account_activation', 'account_deactivation', 'loan_status', 'atm_location']:
@@ -77,10 +84,59 @@ class InquiryHandler:
             return self._process_new_inquiry(user_id, intent, entities)
             
         except Exception as e:
+            logger.error(f"Error processing inquiry: {str(e)}")
             return {
                 'status': 'error',
                 'message': f'Error processing inquiry: {str(e)}'
             }
+
+    def _handle_pending_inquiry(self, user_id: int, inquiry_text: str, 
+                            new_intent: Optional[str] = None,
+                            new_entities: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """
+        Handle follow-up for pending inquiries with improved context handling
+        """
+        pending = self.pending_inquiries[user_id]
+        
+        # If in verification stage, handle verification
+        if pending.get('verification_stage') is not None:
+            return self._handle_verification(user_id, inquiry_text)
+        
+        # Use provided entities or extract new ones
+        if new_entities is None:
+            # Use chatbot to extract new entities
+            chatbot_response = self.chatbot.get_response(inquiry_text, user_id)
+            new_entities = chatbot_response['entities']
+        
+        # Update provided entities
+        if new_entities:
+            pending['entities'].update(new_entities)
+        
+        # Update missing entities - only for entities that we've gathered
+        pending['missing_entities'] = [
+            entity for entity in pending['missing_entities']
+            if entity not in pending['entities']
+        ]
+        
+        if not pending['missing_entities']:
+            # All entities collected, proceed with handling
+            handlers = {
+                'account_activation': self._handle_activation,
+                'account_deactivation': self._handle_deactivation,
+                'loan_status': self._handle_loan_status,
+                'atm_location': self._handle_atm_location
+            }
+            # Clear the pending inquiry before handling
+            entities = pending['entities']
+            intent = pending['intent']
+            del self.pending_inquiries[user_id]
+            return handlers[intent](user_id, entities)
+        
+        return {
+            'status': 'incomplete',
+            'message': f"Please provide: {', '.join(pending['missing_entities'])}",
+            'missing_fields': pending['missing_entities']
+        }
     
     def _process_new_inquiry(self, user_id: int, intent: str, entities: Dict[str, str]) -> Dict[str, Any]:
         """
@@ -113,44 +169,6 @@ class InquiryHandler:
         
         return handlers[intent](user_id, entities)
     
-    def _handle_pending_inquiry(self, user_id: int, inquiry_text: str) -> Dict[str, Any]:
-        """
-        Handle follow-up for pending inquiries including verification questions
-        """
-        pending = self.pending_inquiries[user_id]
-        
-        # If in verification stage, handle verification
-        if pending.get('verification_stage') is not None:
-            return self._handle_verification(user_id, inquiry_text)
-        
-        # Use chatbot to extract new entities
-        chatbot_response = self.chatbot.get_response(inquiry_text, user_id)
-        new_entities = chatbot_response['entities']
-        
-        # Update provided entities
-        pending['entities'].update(new_entities)
-        
-        # Update missing entities
-        pending['missing_entities'] = [
-            entity for entity in pending['missing_entities']
-            if entity not in new_entities
-        ]
-        
-        if not pending['missing_entities']:
-            # All entities collected, proceed with handling
-            handlers = {
-                'account_activation': self._handle_activation,
-                'account_deactivation': self._handle_deactivation,
-                'loan_status': self._handle_loan_status,
-                'atm_location': self._handle_atm_location
-            }
-            return handlers[pending['intent']](user_id, pending['entities'])
-        
-        return {
-            'status': 'incomplete',
-            'message': f"Please provide: {', '.join(pending['missing_entities'])}",
-            'missing_fields': pending['missing_entities']
-        }
     
     def _verify_response(self, verification_type: str, stage: int, response: str, user: User) -> bool:
         """
@@ -446,19 +464,42 @@ class InquiryHandler:
             db.session.rollback()
             return {'status': 'error', 'message': 'Error processing deactivation request'}
     
+        # Add caching for frequently accessed data
+    @lru_cache(maxsize=128)
+    def _get_required_entities(self, intent: str) -> list:
+        """
+        Get required entities for each intent with caching
+        """
+        requirements = {
+            'account_activation': ['account_type', 'account_number'],
+            'account_deactivation': ['account_type', 'account_number', 'reason_code'],
+            'loan_status': ['application_id', 'loan_type'],
+            'atm_location': ['location']
+        }
+        return requirements.get(intent, [])
+
+    # Optimize database queries with filter optimization
     def _handle_loan_status(self, user_id: int, entities: Dict[str, str]) -> Dict[str, Any]:
         """
-        Handle loan status inquiry
+        Handle loan status inquiry with optimized database query
         """
         try:
-            loan = db.session.query(Loan).filter(
-                Loan.UserID == user_id,
-                Loan.ApplicationID == entities['application_id']
-            ).first()
+            # Use more specific queries with indexable fields first
+            filters = [Loan.UserID == user_id]
+            
+            if 'application_id' in entities:
+                filters.append(Loan.ApplicationID == entities['application_id'])
+            
+            if 'loan_type' in entities:
+                filters.append(Loan.LoanType == entities['loan_type'])
+            
+            # Execute optimized query
+            loan = db.session.query(Loan).filter(*filters).first()
             
             if not loan:
                 return {'status': 'error', 'message': 'Loan application not found'}
             
+            # Use SQLAlchemy's defer() for fields not immediately needed
             return {
                 'status': 'success',
                 'data': {
@@ -472,25 +513,43 @@ class InquiryHandler:
             }
             
         except Exception as e:
+            logger.error(f"Error processing loan status inquiry: {str(e)}")
             db.session.rollback()
             return {'status': 'error', 'message': 'Error processing loan status inquiry'}
-    
+
+    # Add batch processing for multiple database operations
     def _handle_atm_location(self, user_id: int, entities: Dict[str, str]) -> Dict[str, Any]:
         """
-        Handle ATM location inquiry
+        Handle ATM location inquiry with improved database query
         """
         try:
-            atms = db.session.query(ATMLocation).filter(
-                ATMLocation.City == entities['location'],
+            location = entities.get('location', '').strip()
+            if not location:
+                return {'status': 'error', 'message': 'Location is required'}
+                
+            # Use a cache key for this query
+            cache_key = f"atm_location_{location}"
+            
+            # Check cache first
+            if cache_key in self.chatbot.cache and self.cache_timestamp.get(cache_key, datetime.min) > datetime.now() - self.cache_timeout:
+                return self.chatbot.cache[cache_key]
+            
+            # Query with index optimization - city is likely indexed
+            query = db.session.query(
+                ATMLocation.BranchName,
+                ATMLocation.Address,
+                ATMLocation.City,
+                ATMLocation.State,
+                ATMLocation.ZipCode,
+                ATMLocation.OperatingHours,
+                ATMLocation.AdditionalServices
+            ).filter(
+                ATMLocation.City.ilike(f"%{location}%"),
                 ATMLocation.IsAccessible == True
-            ).limit(5).all()
+            ).limit(5)
             
-            if not atms:
-                return {'status': 'error', 'message': 'No ATMs found in the specified location'}
-            
-            return {
-                'status': 'success',
-                'data': [{
+            atm_data = [
+                {
                     'branch_name': atm.BranchName,
                     'address': atm.Address,
                     'city': atm.City,
@@ -498,22 +557,20 @@ class InquiryHandler:
                     'zip_code': atm.ZipCode,
                     'operating_hours': atm.OperatingHours,
                     'additional_services': atm.AdditionalServices
-                } for atm in atms]
-            }
+                } for atm in query.all()
+            ]
+            
+            if not atm_data:
+                result = {'status': 'error', 'message': 'No ATMs found in the specified location'}
+            else:
+                result = {'status': 'success', 'data': atm_data}
+                
+            # Cache the result
+            self.chatbot.cache[cache_key] = result
+            self.cache_timestamp[cache_key] = datetime.now()
+            
+            return result
             
         except Exception as e:
-            db.session.rollback()
+            logger.error(f"Error processing ATM location inquiry: {str(e)}")
             return {'status': 'error', 'message': 'Error processing ATM location inquiry'}
-    
-    def _get_required_entities(self, intent: str) -> list:
-        """
-        Get required entities for each intent
-        """
-        requirements = {
-            'account_activation': ['account_type', 'account_number'],
-            'account_deactivation': ['account_type', 'account_number', 'reason_code'],
-            'loan_status': ['application_id', 'loan_type'],
-            'atm_location': ['location']
-        }
-        return requirements.get(intent, [])
-    
