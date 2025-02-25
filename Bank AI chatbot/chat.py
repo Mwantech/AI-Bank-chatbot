@@ -119,83 +119,134 @@ def register_socket_handlers(socketio_instance):
                 }
                 active_sessions[str(session_id)] = session_state
             
-            # Get response from chatbot
+            # First, check if we're in the middle of collecting entities
+            if session_state['missing_entities']:
+                logger.info(f"In entity collection mode, missing: {session_state['missing_entities']}")
+                
+                # Parse the user's response as potential entity values
+                entity_values = [val.strip() for val in message.split(',')]
+                
+                # If we have the same number of values as missing entities, match them up
+                if len(entity_values) == len(session_state['missing_entities']):
+                    entities = {}
+                    for i, entity_name in enumerate(session_state['missing_entities']):
+                        entities[entity_name] = entity_values[i]
+                    
+                    # Update collected entities
+                    session_state['collected_entities'].update(entities)
+                    
+                    # Use the inquiry handler with the current intent and collected entities
+                    intent = session_state['current_intent']
+                    all_entities = session_state['collected_entities']
+                    
+                    # Clear missing entities since we've collected them
+                    session_state['missing_entities'] = []
+                    
+                    if intent in ['account_activation', 'account_deactivation', 'loan_status', 'atm_location']:
+                        logger.info(f"Processing {intent} with entities: {all_entities}")
+                        
+                        try:
+                            # Use InquiryHandler to process the request
+                            inquiry_response = inquiry_handler.handle_inquiry(
+                                int(current_user.UserID),
+                                message,
+                                intent,
+                                all_entities
+                            )
+                            
+                            if inquiry_response:
+                                response_text = inquiry_response.get('message', 'Request processed')
+                                missing_fields = inquiry_response.get('missing_fields', [])
+                                
+                                # If still incomplete, update missing entities
+                                if missing_fields:
+                                    session_state['missing_entities'] = missing_fields
+                                    response_data = {
+                                        'response': response_text,
+                                        'intent': intent,
+                                        'entities': all_entities,
+                                        'missing_entities': missing_fields
+                                    }
+                                else:
+                                    # Request completed successfully
+                                    response_data = {
+                                        'response': response_text,
+                                        'intent': intent,
+                                        'entities': all_entities
+                                    }
+                                    
+                                # Store message with the actual response from inquiry handler
+                                chat_message = ChatMessage(
+                                    SessionID=session_id,
+                                    Message=message,
+                                    Response=response_data['response'],
+                                    Intent=intent
+                                )
+                                db.session.add(chat_message)
+                                db.session.commit()
+                                
+                                emit('response', {
+                                    'message_id': chat_message.MessageID,
+                                    'response': response_data['response'],
+                                    'intent': intent,
+                                    'entities': all_entities,
+                                    'missing_entities': missing_fields if missing_fields else [],
+                                    'conversation_active': bool(missing_fields)
+                                })
+                                return
+                        except Exception as e:
+                            logger.error(f"Error processing inquiry: {str(e)}")
+                            emit('error', {'message': f'Failed to process inquiry: {str(e)}'})
+                            return
+                
+                # If we couldn't match entities from the response, continue with normal processing
+                logger.info("Couldn't match entities from response, continuing with normal processing")
+            
+            # Normal processing for new intents or when entity matching failed
             try:
                 response_data = chatbot.get_response(
                     message,
                     str(current_user.UserID)
                 )
                 
-                # Ensure required keys exist in response_data
-                if not isinstance(response_data, dict):
-                    response_data = {
-                        'response': 'Error: Received invalid response format',
-                        'intent': None,
-                        'entities': {},
-                        'missing_entities': []
-                    }
+                logger.info(f"Chatbot response data: {response_data}")
                 
-                # Add default values for missing keys
+                # Make sure response contains required fields
                 if 'response' not in response_data:
-                    response_data['response'] = "I couldn't process that request properly."
-                    logger.warning(f"Missing 'response' key in chatbot response: {response_data}")
+                    response_data['response'] = "I couldn't process that properly. Can you try again?"
                 
                 if 'intent' not in response_data:
-                    response_data['intent'] = None
+                    response_data['intent'] = session_state.get('current_intent', 'unknown')
                 
-                if 'entities' not in response_data:
-                    response_data['entities'] = {}
-                
-                if 'missing_entities' not in response_data:
-                    response_data['missing_entities'] = []
-                
-                # Check if intent has changed - if so, reset entities
-                if response_data.get('intent') and response_data.get('intent') != session_state['current_intent']:
-                    # Clear previous state when intent changes
-                    session_state['current_intent'] = response_data.get('intent')
-                    session_state['collected_entities'] = {}
-                    session_state['missing_entities'] = []
-                else:
-                    # Update current intent if not already set
-                    if not session_state['current_intent'] and response_data.get('intent'):
-                        session_state['current_intent'] = response_data.get('intent')
-                
-                # Update collected entities
-                if response_data['entities']:
-                    session_state['collected_entities'].update(response_data['entities'])
-                
-                # Handle missing entities case
-                if response_data['missing_entities']:
-                    session_state['missing_entities'] = response_data['missing_entities']
+                # Check if this is a new intent
+                new_intent = response_data.get('intent')
+                if new_intent and new_intent != session_state['current_intent'] and new_intent not in ['unknown', 'fallback', 'goodbye']:
+                    logger.info(f"New intent detected: {new_intent}")
+                    session_state['current_intent'] = new_intent
+                    session_state['collected_entities'] = response_data.get('entities', {})
                     
-                    chat_message = ChatMessage(
-                        SessionID=session_id,
-                        Message=message,
-                        Response=response_data['response'],
-                        Intent=response_data['intent'] if response_data['intent'] else 'unknown'
-                    )
-                    db.session.add(chat_message)
-                    db.session.commit()
-                    
-                    emit('response', {
-                        'message_id': chat_message.MessageID,
-                        'response': response_data['response'],
-                        'intent': response_data['intent'],
-                        'missing_entities': response_data['missing_entities'],
-                        'conversation_active': True
-                    })
-                    return
-                
-                # Handle completion of entity collection
-                if session_state['missing_entities'] and not response_data['missing_entities']:
-                    session_state['missing_entities'] = []
+                    # Check if we need to collect more entities for this intent
+                    if new_intent in ['account_activation', 'account_deactivation', 'loan_status', 'atm_location']:
+                        try:
+                            required_entities = inquiry_handler._get_required_entities(new_intent)
+                            collected_entities = set(session_state['collected_entities'].keys())
+                            missing_entities = [e for e in required_entities if e not in collected_entities]
+                            
+                            if missing_entities:
+                                logger.info(f"Missing entities for {new_intent}: {missing_entities}")
+                                session_state['missing_entities'] = missing_entities
+                                response_data['missing_entities'] = missing_entities
+                                response_data['response'] = f"Please provide the following information: {', '.join(missing_entities)}"
+                        except Exception as e:
+                            logger.error(f"Error getting required entities: {str(e)}")
+                            response_data['response'] = "I couldn't process that request. Please try again."
                 
                 # Store message
                 chat_message = ChatMessage(
                     SessionID=session_id,
                     Message=message,
                     Response=response_data['response'],
-                    Intent=response_data['intent'] if response_data['intent'] else 'unknown'
+                    Intent=response_data['intent']
                 )
                 db.session.add(chat_message)
                 db.session.commit()
@@ -204,34 +255,14 @@ def register_socket_handlers(socketio_instance):
                     'message_id': chat_message.MessageID,
                     'response': response_data['response'],
                     'intent': response_data['intent'],
-                    'entities': response_data['entities'],
-                    'conversation_active': bool(session_state['missing_entities'])
+                    'entities': response_data.get('entities', {}),
+                    'missing_entities': response_data.get('missing_entities', []),
+                    'conversation_active': bool(session_state.get('missing_entities', []))
                 })
                 
             except Exception as e:
                 logger.error(f"Error processing message: {str(e)}")
-                
-                # Create a fallback response
-                fallback_response = "I'm sorry, I encountered an error processing your message."
-                
-                # Store the error message
-                chat_message = ChatMessage(
-                    SessionID=session_id,
-                    Message=message,
-                    Response=fallback_response,
-                    Intent='error'
-                )
-                db.session.add(chat_message)
-                db.session.commit()
-                
-                emit('response', {
-                    'message_id': chat_message.MessageID,
-                    'response': fallback_response,
-                    'intent': 'error',
-                    'entities': {},
-                    'conversation_active': False,
-                    'error': str(e)
-                })
+                emit('error', {'message': f'Failed to process message: {str(e)}'})
                 
         except Exception as e:
             logger.error(f"Error in handle_message: {str(e)}")
@@ -275,11 +306,18 @@ def register_socket_handlers(socketio_instance):
             if str(session_id) in active_sessions:
                 del active_sessions[str(session_id)]
             
-            # Clean up any pending inquiries
-            if hasattr(inquiry_handler, 'pending_inquiries') and int(current_user.UserID) in inquiry_handler.pending_inquiries:
-                del inquiry_handler.pending_inquiries[int(current_user.UserID)]
+            # Clean up any pending inquiries - safely
+            try:
+                if hasattr(inquiry_handler, 'pending_inquiries') and int(current_user.UserID) in inquiry_handler.pending_inquiries:
+                    del inquiry_handler.pending_inquiries[int(current_user.UserID)]
+            except Exception as e:
+                logger.warning(f"Error clearing pending inquiries: {str(e)}")
             
-            chatbot.clear_user_data(str(current_user.UserID))
+            # Safely clear user data
+            try:
+                chatbot.clear_user_data(str(current_user.UserID))
+            except Exception as e:
+                logger.warning(f"Error clearing chatbot user data: {str(e)}")
             
             emit('session_ended', {'message': 'Chat session ended successfully'})
             
@@ -316,11 +354,18 @@ def register_socket_handlers(socketio_instance):
             if str(session_id) in active_sessions:
                 del active_sessions[str(session_id)]
             
-            # Clean up any pending inquiries
-            if hasattr(inquiry_handler, 'pending_inquiries') and int(current_user.UserID) in inquiry_handler.pending_inquiries:
-                del inquiry_handler.pending_inquiries[int(current_user.UserID)]
+            # Safely clean up any pending inquiries
+            try:
+                if hasattr(inquiry_handler, 'pending_inquiries') and int(current_user.UserID) in inquiry_handler.pending_inquiries:
+                    del inquiry_handler.pending_inquiries[int(current_user.UserID)]
+            except Exception as e:
+                logger.warning(f"Error clearing pending inquiries in force end: {str(e)}")
             
-            chatbot.clear_user_data(str(current_user.UserID))
+            # Safely clear chatbot data
+            try:
+                chatbot.clear_user_data(str(current_user.UserID))
+            except Exception as e:
+                logger.warning(f"Error clearing chatbot user data in force end: {str(e)}")
             
             emit('session_ended', {'message': 'Chat session forcefully ended'})
             
