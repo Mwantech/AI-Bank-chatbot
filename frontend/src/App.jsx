@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './auth/Login';
 import ChatInterface from './components/Chatinterface';
-import styles from './styles.module.css';
 
 const App = () => {
   const [user, setUser] = useState(null);
@@ -36,59 +35,45 @@ const App = () => {
     setUser(userData);
   };
 
-  const handleLogout = () => {
-    // Clear all auth data
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('user');
-    setUser(null);
-  };
-
   if (isLoading) {
     return (
-      <div className={styles['loading-container']}>
-        <div className={styles['loading-spinner']}></div>
-        <p>Loading...</p>
+      <div className="flex flex-col items-center justify-center h-screen">
+        <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+        <p className="mt-4 text-gray-700">Loading...</p>
       </div>
     );
   }
 
   return (
     <Router>
-      <div className={styles['app-container']}>
-        {user && (
-          <nav className={styles['nav-bar']}>
-            
-            <button 
-              onClick={handleLogout}
-              className={styles['logout-button']}
-            >
-              Logout
-            </button>
-          </nav>
-        )}
-
-        <Routes>
-          <Route 
-            path="/login" 
-            element={
-              user ? (
-                <Navigate to="/" replace />
-              ) : (
-                <Login onLoginSuccess={handleLoginSuccess} />
-              )
-            } 
-          />
-          <Route 
-            path="/" 
-            element={
-              user ? (
-                <ChatInterface user={user} />
-              ) : (
-                <Navigate to="/login" replace />
-              )
-            } 
-          />
-        </Routes>
+      <div className="min-h-screen bg-gray-50">
+        <div className="container mx-auto px-4 py-6">
+          <Routes>
+            <Route 
+              path="/login" 
+              element={
+                user ? (
+                  <Navigate to="/" replace />
+                ) : (
+                  <Login onLoginSuccess={handleLoginSuccess} />
+                )
+              } 
+            />
+            <Route 
+              path="/" 
+              element={
+                user ? (
+                  <ChatInterface 
+                    user={user} 
+                    setUser={setUser} 
+                  />
+                ) : (
+                  <Navigate to="/login" replace />
+                )
+              } 
+            />
+          </Routes>
+        </div>
       </div>
     </Router>
   );

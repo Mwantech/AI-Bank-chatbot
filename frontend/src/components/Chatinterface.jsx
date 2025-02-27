@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { io } from 'socket.io-client';
 import axios from 'axios';
-import styles from '../styles.module.css';
 
-const ChatInterface = ({ user }) => {
+const ChatInterface = ({ user, setUser }) => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -213,6 +212,17 @@ const ChatInterface = ({ user }) => {
     }
   };
 
+  const handleLogout = () => {
+    // Clear all auth data
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('user');
+    if (socket) {
+      socket.disconnect();
+    }
+    setUser(null);
+    window.location.href = '/login';
+  };
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -224,73 +234,108 @@ const ChatInterface = ({ user }) => {
   const isInputDisabled = !isConnected || !sessionId || isLoading;
 
   return (
-    <div className={styles['chat-container']}>
-      <div className={styles['chat-header']}>
-        <h3>Banking Assistant</h3>
-        <p>Welcome, {user.firstName}</p>
-        <div className={styles['connection-status']}>
-          {isConnected ? (
-            <span className={styles['connected']}>●Connected</span>
-          ) : isReconnecting ? (
-            <span className={styles['reconnecting']}>●Reconnecting...</span>
-          ) : (
-            <span className={styles['disconnected']}>●Disconnected</span>
-          )}
+    <div className="flex flex-col h-[600px] bg-white rounded-lg shadow-lg overflow-hidden">
+      <div className="bg-blue-600 text-white p-4">
+        <div className="flex justify-between items-center">
+          <h3 className="text-xl font-semibold">Banking Assistant</h3>
+          <button 
+            onClick={handleLogout}
+            className="px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600 transition-colors"
+          >
+            Logout
+          </button>
+        </div>
+        <div className="flex justify-between items-center mt-2">
+          <p className="text-sm">Welcome, {user.firstName}</p>
+          <div className="text-sm">
+            {isConnected ? (
+              <span className="flex items-center">
+                <span className="w-2 h-2 rounded-full bg-green-400 mr-2"></span>
+                Connected
+              </span>
+            ) : isReconnecting ? (
+              <span className="flex items-center">
+                <span className="w-2 h-2 rounded-full bg-yellow-400 mr-2 animate-pulse"></span>
+                Reconnecting...
+              </span>
+            ) : (
+              <span className="flex items-center">
+                <span className="w-2 h-2 rounded-full bg-red-500 mr-2"></span>
+                Disconnected
+              </span>
+            )}
+          </div>
         </div>
       </div>
 
-      <div className={styles['messages-container']}>
+      <div className="flex-1 p-4 overflow-y-auto bg-gray-50">
         {messages.map((message, index) => (
           <div
             key={index}
-            className={`${styles['message']} ${
-              styles[message.type === 'user' ? 'user-message' : 'bot-message']
-            } ${message.isPrompt ? styles['prompt-message'] : ''}`}
+            className={`mb-4 max-w-[80%] ${
+              message.type === 'user' ? 'ml-auto' : 'mr-auto'
+            }`}
           >
-            <div className={styles['message-content']}>
+            <div 
+              className={`p-3 rounded-lg ${
+                message.type === 'user' 
+                  ? 'bg-blue-500 text-white rounded-br-none' 
+                  : message.isPrompt 
+                    ? 'bg-yellow-100 border border-yellow-300 text-yellow-800'
+                    : 'bg-gray-200 text-gray-800 rounded-bl-none'
+              }`}
+            >
               {message.content}
             </div>
             {message.type === 'bot' && message.intent && (
-              <div className={styles['message-intent']}>
+              <div className="text-xs text-gray-500 mt-1 pl-1">
                 Intent: {message.intent}
               </div>
             )}
             {message.missing_entities && message.missing_entities.length > 0 && (
-              <div className={styles['missing-entities']}>
+              <div className="text-xs text-gray-500 mt-1 pl-1">
                 Missing: {message.missing_entities.join(', ')}
               </div>
             )}
           </div>
         ))}
         {isLoading && (
-          <div className={styles['bot-message']}>
-            <div className={styles['typing-indicator']}>...</div>
+          <div className="mb-4 max-w-[80%] mr-auto">
+            <div className="p-3 rounded-lg bg-gray-200 text-gray-800 rounded-bl-none flex items-center">
+              <div className="flex space-x-1">
+                <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '300ms' }}></div>
+              </div>
+            </div>
           </div>
         )}
         {error && (
-          <div className={styles['error-message']}>
+          <div className="my-2 p-3 rounded bg-red-100 border border-red-300 text-red-800 text-sm">
             {error}
           </div>
         )}
         <div ref={messagesEndRef} />
       </div>
 
-      <form onSubmit={handleSubmit} className={styles['chat-input-form']}>
-        <input
-          type="text"
-          value={input}
-          onChange={handleInputChange}
-          placeholder={isConnected ? "Type your message..." : "Connecting..."}
-          disabled={isInputDisabled}
-          className={styles['chat-input']}
-        />
-        <button
-          type="submit"
-          disabled={isInputDisabled || !input.trim()}
-          className={styles['send-button']}
-        >
-          Send
-        </button>
+      <form onSubmit={handleSubmit} className="p-3 bg-gray-100 border-t border-gray-200">
+        <div className="flex">
+          <input
+            type="text"
+            value={input}
+            onChange={handleInputChange}
+            placeholder={isConnected ? "Type your message..." : "Connecting..."}
+            disabled={isInputDisabled}
+            className="flex-1 p-3 border border-gray-300 rounded-l-lg focus:outline-none focus:border-blue-500"
+          />
+          <button
+            type="submit"
+            disabled={isInputDisabled || !input.trim()}
+            className="bg-blue-600 text-white px-4 py-3 rounded-r-lg hover:bg-blue-700 transition-colors disabled:bg-blue-300 disabled:cursor-not-allowed"
+          >
+            Send
+          </button>
+        </div>
       </form>
     </div>
   );
