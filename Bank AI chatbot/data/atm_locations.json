@@ -1,0 +1,72 @@
+[
+    {
+      "branch_name": "Main Street Branch",
+      "address": "123 Main St",
+      "city": "Atlanta",
+      "state": "Georgia",
+      "zip_code": "30303",
+      "operating_hours": "24/7",
+      "additional_services": "Deposits, Withdrawals, Check Cashing",
+      "is_accessible": true
+    },
+    {
+      "branch_name": "Peachtree Center",
+      "address": "456 Peachtree St NE",
+      "city": "Atlanta",
+      "state": "Georgia",
+      "zip_code": "30308",
+      "operating_hours": "24/7",
+      "additional_services": "Deposits, Withdrawals, Account Services",
+      "is_accessible": true
+    },
+    {
+      "branch_name": "Buckhead Branch",
+      "address": "3050 Peachtree Rd NW",
+      "city": "Atlanta",
+      "state": "Georgia",
+      "zip_code": "30305",
+      "operating_hours": "24/7",
+      "additional_services": "Full Service",
+      "is_accessible": true
+    },
+    {
+      "branch_name": "Savannah Downtown",
+      "address": "25 Bull St",
+      "city": "Savannah",
+      "state": "Georgia",
+      "zip_code": "31401",
+      "operating_hours": "Mon-Fri: 9AM-6PM, Sat: 9AM-1PM",
+      "additional_services": "Deposits, Withdrawals",
+      "is_accessible": true
+    },
+    {
+      "branch_name": "Augusta Main",
+      "address": "699 Broad St",
+      "city": "Augusta",
+      "state": "Georgia",
+      "zip_code": "30901",
+      "operating_hours": "24/7",
+      "additional_services": "Deposits, Withdrawals, Account Services",
+      "is_accessible": true
+    },
+    {
+      "branch_name": "Macon Branch",
+      "address": "455 Walnut St",
+      "city": "Macon",
+      "state": "Georgia",
+      "zip_code": "31201",
+      "operating_hours": "24/7",
+      "additional_services": "Full Service",
+      "is_accessible": true
+    },
+    {
+      "branch_name": "Columbus Riverfront",
+      "address": "1200 Broadway",
+      "city": "Columbus",
+      "state": "Georgia",
+      "zip_code": "31901",
+      "operating_hours": "Mon-Sat: 8AM-8PM",
+      "additional_services": "Deposits, Withdrawals",
+      "is_accessible": true
+    }
+  ]

@@ -1,0 +1,455 @@
+{
+  "intents": [
+    {
+      "intent": "greeting",
+      "patterns": [
+        "Hi",
+        "Hello",
+        "Hey there",
+        "Good morning",
+        "Good afternoon",
+        "Good evening",
+        "Hi, I need help with my account",
+        "Hello, can you assist me?",
+        "Hey, I have a question about banking",
+        "Hi there, I'm having trouble with my account",
+        "Hello, is someone available to help?",
+        "Hi, I'm a new customer",
+        "Greetings",
+        "Hi, first time using this service",
+        "Hello, just signed up for an account",
+        "Hey, looking for some banking advice",
+        "Morning, need some quick help",
+        "Evening, hope someone's available",
+        "Hi there, considering opening an account",
+        "Hello, returning customer here"
+      ],
+      "responses": [
+        "Hello! Welcome to our banking services. How can I assist you today? Whether you need help with your account, information about our services, or assistance with a transaction, I'm here to guide you through every step.",
+        
+        "Hi there! I'm your personal banking assistant, ready to help with any questions or concerns you might have. From account inquiries to service information, I'm here to make your banking experience smooth and convenient. What can I help you with today?",
+        
+        "Welcome to our virtual banking center! I'm here to provide you with personalized assistance for all your banking needs. Whether you're a new customer or have been with us for years, I'm ready to help you navigate our services and answer any questions you might have.",
+        
+        "Hello and thank you for reaching out! I'm your dedicated banking assistant, here to provide you with prompt and helpful service. Whether you need account information, transaction assistance, or general banking guidance, I'm ready to assist you in any way I can. How may I help you today?"
+      ]
+    },
+    {
+      "intent": "goodbye",
+      "patterns": [
+        "Bye",
+        "See you later",
+        "Goodbye",
+        "Thanks, bye",
+        "Have a good day",
+        "That's all I needed",
+        "Thanks for your help",
+        "I'm done for now",
+        "Talk to you later",
+        "Thanks for the assistance",
+        "That's everything, thanks",
+        "Signing off now",
+        "You've been very helpful, goodbye",
+        "Got what I needed, thank you",
+        "I appreciate your help, bye now",
+        "You've answered my questions, goodbye",
+        "That covers everything, thanks",
+        "Ending our chat for today",
+        "Will reach out again if needed",
+        "Thanks for the information, bye"
+      ],
+      "responses": [
+        "Goodbye and thank you for banking with us today! It's been a pleasure assisting you with your financial needs. Remember, our online banking services are available 24/7, and our customer support team is always here when you need additional help. Have a wonderful day, and we look forward to serving you again soon!",
+        
+        "Thank you for choosing our banking services today! I'm glad I could be of assistance. Our team is committed to providing you with exceptional service whenever you need it. If you have any further questions or need help in the future, don't hesitate to reach out. Have a fantastic day ahead!",
+        
+        "Thanks for chatting with us today! Your financial well-being is our priority, and we're always here to support you on your financial journey. Remember, you can access your accounts anytime through our mobile app or online banking portal. Have a great day, and we hope to assist you again soon!",
+        
+        "Goodbye and thank you for your time today! It's been a pleasure helping you with your banking needs. Remember that you can reach us 24/7 through our mobile app, online banking, or customer service line if anything else comes up. We value your business and look forward to continuing to serve you. Have a wonderful day!"
+      ]
+    },
+    {
+      "intent": "account_balance",
+      "patterns": [
+        "What's my current balance?",
+        "How much money do I have in my account?",
+        "Can you tell me my account balance?",
+        "Show me my balance",
+        "Balance inquiry",
+        "What's the available balance in my account?",
+        "How much is left in my account?",
+        "Current balance please",
+        "I need to check my account balance",
+        "Tell me how much I have in my account",
+        "What's my available balance?",
+        "Could you check my balance in all accounts?",
+        "Balance check please",
+        "I want to know how much money I have",
+        "Can you show me all my account balances?",
+        "What's my current balance?",
+        "What's my checking account balance?",
+        "How much savings do I have?",
+        "Need to see all my balances right away",
+        "My current financial status",
+        "Is my paycheck deposited yet?",
+        "Did my balance change since yesterday?",
+        "What's my available credit?",
+        "How much overdraft protection do I have?",
+        "What's my minimum balance requirement?"
+      ],
+      "responses": [
+        "For your security and privacy, I cannot directly access or display your account balance in this chat. Your financial information is protected by our advanced security protocols. Here are several convenient and secure ways to check your balance:\n\n1. Online Banking: Log into your secure account dashboard at our website where you can view all your accounts, transactions, and balances in real-time\n\n2. Mobile App: Our mobile banking app provides instant access to your balances with just a fingerprint or face ID verification\n\n3. ATM Services: Visit any of our ATMs or partner network locations to check your balance without any fees\n\n4. Phone Banking: Call our automated service at 1-800-XXX-XXXX and follow the prompts to hear your current balance\n\n5. Text Banking: If you've enrolled in our text banking service, simply text 'BAL' to XXXXX to receive your balance information\n\nIs there a particular method that would be most convenient for you to check your balance?",
+        
+        "To protect your account security and comply with financial regulations, I'm unable to display your balance directly in this conversation. Your financial privacy is our top priority, and we offer multiple secure channels for you to access this information:\n\n• Secure Online Banking Portal: Log in with your credentials to view comprehensive account information\n\n• Mobile Banking App: Check balances instantly with secure biometric authentication\n\n• ATM Network: Use any of our 10,000+ ATMs nationwide for balance inquiries\n\n• In-Branch Service: Visit any branch with valid ID for personal assistance\n\n• Telephone Banking: Our secure automated system at 1-800-XXX-XXXX provides balance information after identity verification\n\nMany customers find our mobile app to be the most convenient option as it provides real-time updates and alert notifications for balance changes. Would you like information on setting up any of these services?",
+        
+        "For account security and to safeguard your financial information, I cannot directly access or share your balance in this conversation. Your account security is our highest priority, which is why we've implemented multiple secure channels for you to check your balance:\n\n1. Online Banking: Our secure portal provides 24/7 access to all your accounts\n\n2. Mobile Banking App: Check balances on-the-go with our highly-rated app featuring instant balance views even without logging in\n\n3. Branch Locations: Our financial advisors can assist you in person\n\n4. ATM Services: Our extensive network offers free balance inquiries\n\n5. Phone Banking: Our secure automated system is available at 1-800-XXX-XXXX\n\nAdditionally, you can set up custom alerts to notify you when your balance falls below a certain threshold or when large transactions occur. Would you like me to explain how to set up these alerts to help you monitor your account?"
+      ]
+    },
+    {
+      "intent": "transaction_history",
+      "patterns": [
+        "Show my recent transactions",
+        "I need to see my transaction history",
+        "What transactions have I made recently?",
+        "Show me my transactions",
+        "Get my transaction history",
+        "Can I see my spending?",
+        "List all transactions",
+        "Show my pending transactions",
+        "I don't recognize a transaction",
+        "Where did I spend money?",
+        "Show me all transactions",
+        "What did I spend?",
+        "I need to see all my purchases",
+        "Find transactions",
+        "Show me withdrawals",
+        "What bills were paid?",
+        "Display my recurring transactions",
+        "Search for purchases",
+        "Download my statement",
+        "Transactions from last month",
+        "Filter transactions by amount",
+        "Show transactions by category",
+        "Find my deposit history",
+        "When was my last paycheck deposited?",
+        "Show me my refunds",
+        "Check for unauthorized transactions",
+        "Get transaction details for tax purposes",
+        "Show only ATM withdrawals"
+      ],
+      "responses": [
+        "For your security and to protect your financial privacy, I cannot directly access your transaction history in this conversation. Your detailed financial records are available through several secure channels designed to protect your information while providing comprehensive access:\n\n1. Online Banking Portal: Log in to your secure account to view, filter, and search transactions by date, amount, or merchant. You can also categorize spending for better financial management and download statements for any time period.\n\n2. Mobile Banking App: Our highly-rated app allows you to view transactions on-the-go with powerful search features. You can set up instant notifications for all transactions to monitor your account in real-time.\n\n3. Monthly Statements: Access electronic or paper statements showing all account activity, organized by date and category for easy reference.\n\n4. In-Branch Assistance: Visit any branch with proper identification, and our banking specialists can help review your transaction history and address any concerns about specific transactions.\n\n5. Customer Service Line: Call 1-800-XXX-XXXX for assistance with transaction inquiries after identity verification.\n\nWould you like tips on how to best organize and review your transaction history for budgeting or identifying potential unauthorized transactions?",
+        
+        "To maintain the security of your financial information, I cannot display your transaction history directly in this chat. Your privacy and account security are our top priorities. Here are the secure methods available to access your complete transaction records:\n\n• Secure Online Banking: Log in to view up to 24 months of detailed transaction history, with options to search, filter, and categorize your spending patterns\n\n• Mobile App Access: Review transactions anywhere, anytime with our secure app that includes transaction alerts and spending analysis tools\n\n• E-Statements and Paper Statements: Access monthly summaries of all account activity with categorized spending reports\n\n• Branch Services: Visit any location with proper ID for personalized assistance reviewing your transaction history\n\n• Transaction Dispute Services: If you don't recognize a transaction, our specialized team can help investigate through our secure channels\n\nMany customers find our digital banking tools particularly helpful for tracking spending patterns and identifying areas for potential savings. Would you like information about our new spending analysis feature that automatically categorizes your transactions?"
+      ]
+    },
+    {
+      "intent": "fund_transfer",
+      "patterns": [
+        "I want to transfer money",
+        "How do I send money to another account?",
+        "Transfer money",
+        "Move money between accounts",
+        "Send money",
+        "Make a transfer",
+        "Schedule a transfer",
+        "Set up recurring transfers",
+        "I need to wire money",
+        "How do I send money internationally?",
+        "Can I transfer money to someone without their account number?",
+        "Set up automatic transfers",
+        "Transfer money to my account",
+        "Send money",
+        "Quick transfer",
+        "Move funds between my accounts",
+        "International wire",
+        "Setup bill pay",
+        "Send money to a friend",
+        "Transfer to external account",
+        "Send money using phone number",
+        "Person-to-person payment",
+        "Transfer to family member",
+        "Move money from savings to checking",
+        "Same-day transfer options",
+        "Transfer limits",
+        "Mobile transfer",
+        "Transfer fee information",
+        "Send emergency funds"
+      ],
+      "responses": [
+        "I'd be happy to explain our various money transfer options to help you move funds quickly and securely. We offer several methods tailored to different needs:\n\n1. Online and Mobile Transfers:\n   • Between Your Accounts: Instantly move money between your own accounts with no fees\n   • To Other Customers: Transfer to other account holders using just their email or phone number\n   • External Accounts: Link and transfer to accounts at other financial institutions (typically 1-3 business days)\n   • Step-by-step guide: Log in → Select 'Transfer' → Choose accounts → Enter amount → Review and confirm\n\n2. Person-to-Person Payments:\n   • Our secure P2P payment system lets you send money to almost anyone with just their email or mobile number\n   • Recipients receive notification and instructions to collect funds\n   • Fast processing with transfers typically completed within minutes\n\n3. Wire Transfers:\n   • Domestic: Same-day transfer for urgent needs ($25 fee)\n   • International: Send money worldwide in over 130 currencies (fees vary by destination)\n   • Available through online banking or at any branch with proper identification\n\n4. Recurring and Scheduled Transfers:\n   • Set up automatic transfers for regular savings, bill payments, or funds management\n   • Customize frequency (weekly, bi-weekly, monthly) and duration\n\nFor security, all transfers require authentication through our secure channels. Would you like specific instructions for a particular type of transfer?",
+        
+        "I'd be delighted to explain our secure transfer options to help you move your money efficiently. Our bank offers comprehensive transfer services designed for security, speed, and convenience:\n\n• Internal Transfers: Move money instantly between your accounts with no fees and no waiting period\n\n• External Transfers: Link accounts from other financial institutions for easy transfers (typically processes in 1-3 business days)\n\n• Zelle® and Person-to-Person Payments: Send money to friends and family using just their email address or phone number, with funds typically arriving within minutes\n\n• Wire Transfers: For high-value or time-sensitive transfers both domestically and internationally\n   - Domestic: Same-day processing when submitted before 5pm ($25 fee)\n   - International: 1-2 business days to most countries ($45 fee plus exchange rate adjustment)\n\n• Recurring Transfer Setup: Automate your financial life by scheduling regular transfers for bill payments, savings goals, or investment contributions\n\n• Mobile Transfer Options: Use our highly-rated app for on-the-go money movement with biometric security features\n\nAll transfers are protected by multi-factor authentication and encrypted connections. Would you like me to walk you through the specific steps for setting up a particular type of transfer?"
+      ]
+    },
+    {
+      "intent": "bill_payment",
+      "patterns": [
+        "I need to pay a bill",
+        "How do I set up bill pay?",
+        "Pay my bill",
+        "Schedule a payment",
+        "Setup automatic bill payments",
+        "When is my next bill payment due?",
+        "Change my bill pay settings",
+        "Cancel a scheduled payment",
+        "View my upcoming bills",
+        "Add a new payee to bill pay",
+        "How long does bill pay take?",
+        "Is my bill payment confirmed?",
+        "Show all my registered billers",
+        "Pay multiple bills at once",
+        "Schedule recurring bill payments",
+        "Pay my utility bill",
+        "Setup autopay for mortgage",
+        "Pay credit card bill",
+        "How to pay my cell phone bill",
+        "Set payment reminders",
+        "Electronic bill delivery options",
+        "Bill payment history",
+        "Pay someone not in my payee list",
+        "Same-day bill payment",
+        "Payment failed notification"
+      ],
+      "responses": [
+        "I'd be happy to explain our comprehensive bill payment system that can save you time and help avoid late payments. Our bill pay service is designed to be flexible, secure, and convenient:\n\n1. Setting Up Bill Pay:\n   • Log into online banking or our mobile app\n   • Navigate to the 'Bill Pay' section\n   • Select 'Add a Payee' and enter the biller information\n   • For many major companies, we can retrieve billing information electronically\n   • For individuals or smaller companies, you can enter their mailing address\n\n2. Payment Options:\n   • One-Time Payments: Schedule individual payments for specific dates\n   • Recurring Payments: Set up automatic payments on a schedule (weekly, monthly, etc.)\n   • eBills: Receive electronic versions of your bills directly in your online banking portal\n   • Payment Methods: Use checking or savings accounts as funding sources\n\n3. Timing and Processing:\n   • Electronic Payments: Typically process in 1-2 business days\n   • Check Payments: May take 5-7 business days for delivery and processing\n   • Rush Payments: Available for same-day or next-day processing (fees apply)\n\n4. Management Features:\n   • Payment Calendar: Visual overview of all scheduled payments\n   • Payment History: Track all past payments for your records\n   • Alerts: Receive notifications when bills arrive, payments are due, or payments are processed\n\nOur bill pay service is free with any checking account and can help you avoid late fees and maintain good credit. Would you like me to explain how to set up a specific type of payment?",
+        
+        "Our bill payment service offers a convenient and secure way to manage all your bills in one place. Here's a comprehensive overview of our bill pay features:\n\n• Centralized Bill Management:\n  - Pay virtually any company or individual in the United States\n  - View, schedule, and track all payments from one dashboard\n  - Receive email or text alerts for upcoming due dates\n\n• Flexible Payment Options:\n  - One-time immediate payments for urgent bills\n  - Future-dated payments scheduled up to one year in advance\n  - Automatic recurring payments with customizable frequency\n  - eBill delivery bringing electronic versions of your bills directly to your banking portal\n\n• Payment Delivery Methods:\n  - Electronic payments to major billers (processing time: 1-2 business days)\n  - Paper checks for payees without electronic connections (processing time: 5-7 days)\n  - Same-day payment options for urgent situations (additional fee applies)\n\n• Enhanced Features:\n  - Bill calendar showing all upcoming due dates\n  - Payment categorization for budgeting purposes\n  - Payment history searchable for up to 24 months\n  - Mobile app access for on-the-go bill management\n\nThis service comes complimentary with your checking account and can save you hours each month while helping you avoid late fees. Would you like me to guide you through setting up your first bill payment or explain how to establish automatic payments for recurring bills?"
+      ]
+    },
+    {
+      "intent": "report_issue",
+      "patterns": [
+        "There's a problem with my account",
+        "I'm having trouble logging in",
+        "My card isn't working",
+        "Error message",
+        "Can't access my account",
+        "Mobile app isn't working",
+        "Website is down",
+        "ATM ate my card",
+        "Transaction failed but money was taken",
+        "Double charged for purchase",
+        "Login error on mobile app",
+        "Password reset not working",
+        "Account shows wrong balance",
+        "Unable to make payments",
+        "Online banking is slow",
+        "Suspicious activity on my account",
+        "My account is locked",
+        "Need to dispute a charge",
+        "Getting error code when trying to log in",
+        "My transfer didn't go through",
+        "Account access is blocked",
+        "Someone made unauthorized purchases",
+        "My direct deposit is missing",
+        "Debit card was declined",
+        "Need to report identity theft"
+      ],
+      "responses": [
+        "I'm very sorry to hear you're experiencing an issue. Your banking security and satisfaction are our top priorities, and we have dedicated support channels to resolve your problem quickly:\n\n1. Immediate Assistance Options:\n   • 24/7 Customer Support: Call our secure helpline at 1-800-XXX-XXXX where our specialists can verify your identity and address your concern immediately\n   • Secure Messaging: Log into online banking (if accessible) and use the secure message center for documented assistance\n   • Branch Visit: Any branch can provide in-person assistance with proper identification\n\n2. For Specific Issues:\n   • Card Problems: Use our mobile app's 'Card Controls' to lock/unlock your card instantly or report it lost/stolen\n   • Suspected Fraud: Call our dedicated fraud department at 1-800-XXX-XXXX available 24/7\n   • Login Issues: Use the 'Forgot Password' option or call our digital banking support at 1-800-XXX-XXXX\n   • Transaction Disputes: Submit details through online banking or call our disputes team\n\n3. Information to Have Ready:\n   • Account number (if available)\n   • Recent transaction details\n   • Any error messages you've received\n   • When the issue first occurred\n\nFor security purposes, never share your password, PIN, or full account number in this chat. Would you like me to connect you with the appropriate specialist based on the specific issue you're experiencing?",
+        
+        "I'm truly sorry you're experiencing an issue with your banking services. Your concern is our priority, and we have specialized teams ready to assist you immediately:\n\n• Urgent Security Concerns (unauthorized transactions, lost cards, account access issues):\n  - Call our 24/7 Fraud & Security Hotline: 1-800-XXX-XXXX\n  - This team can instantly lock your cards, secure your account, and begin fraud investigation if needed\n\n• Technical Support (app issues, online banking errors, password resets):\n  - Contact our Digital Banking Support: 1-800-XXX-XXXX\n  - Available: Monday-Friday 7am-10pm, Weekends 8am-5pm\n  - Alternative: Use the 'Help' section in our app for troubleshooting guides\n\n• Transaction Issues (missing deposits, duplicate charges, incorrect balances):\n  - Contact Account Services: 1-800-XXX-XXXX\n  - They can track transactions, issue provisional credits for disputes, and correct errors\n\n• Card Problems (declined transactions, ATM issues, card activation):\n  - Card Services Team: 1-800-XXX-XXXX\n  - Available 24/7 for immediate card support\n  - Emergency card replacement available in most locations\n\nFor your security, please be prepared to verify your identity when calling. Most issues can be resolved with a single call to the appropriate team. Is there a specific issue I can direct you to the right support channel for?"
+      ]
+    },
+    {
+      "intent": "atm_location",
+      "patterns": [
+        "Where's the nearest ATM?",
+        "Find ATM locations near me",
+        "ATM location",
+        "Where can I withdraw money?",
+        "Is there an ATM near me?",
+        "Show me ATMs in my area",
+        "24-hour ATM locations",
+        "ATMs that accept deposits",
+        "Find ATMs",
+        "Where's the closest drive-through ATM?",
+        "ATMs near me",
+        "Show wheelchair accessible ATMs",
+        "Find ATMs",
+        "Deposit-taking ATMs",
+        "Are there any ATMs open now?",
+        "ATM locations accepting cash deposits",
+        "Find ATMs with no surcharge",
+        "Partner ATMs",
+        "Show me all ATMs",
+        "International ATM locations",
+        "ATMs near my current location",
+        "Find fee-free ATMs",
+        "Closest ATM to my work",
+        "ATMs in downtown area",
+        "ATMs at grocery stores",
+        "Find ATMs that dispense $5 bills",
+        "ATMs with check cashing",
+        "Drive-up ATM locations",
+        "ATMs with cardless access"
+      ],
+      "responses": [
+        "I'd be happy to help you find the most convenient ATM locations for your needs. We offer several easy ways to locate ATMs in our extensive network:\n\n1. Mobile App ATM Finder:\n   • Our mobile banking app features a GPS-enabled ATM locator\n   • Shows real-time directions and distance to the nearest ATMs\n   • Filters for features like drive-thru, 24-hour access, deposit capability, and wheelchair accessibility\n   • Works even without logging in – just tap 'ATM Finder' on the app's welcome screen\n\n2. Online ATM Locator:\n   • Visit our website and use the 'Locations' tool in the top navigation\n   • Enter your address, zip code, or allow location services\n   • Filter results based on your specific needs (deposit-taking, drive-up, etc.)\n\n3. Text Banking Service:\n   • Text 'ATM' followed by your zip code to XXXXX (e.g., 'ATM 90210')\n   • Receive a text with the addresses of the three closest ATMs\n\n4. Partner Networks:\n   • Our bank belongs to the AllPoint®, MoneyPass®, and SUM® networks\n   • This gives you surcharge-free access to over 55,000 ATMs nationwide\n   • Look for these network logos on ATMs to avoid fees\n\n5. Branch Locator:\n   • All our branches have ATMs with full service capabilities\n   • Call our customer service at 1-800-XXX-XXXX for personalized assistance\n\nWould you like me to help you find ATMs with specific features or in a particular location?",
+        
+        "Finding a convenient ATM is easy with our comprehensive network of over 40,000 ATMs nationwide. Here are the best ways to locate the perfect ATM for your needs:\n\n• Mobile App Location Services:\n  - Our top-rated banking app features a built-in ATM locator using your current GPS location\n  - Works without logging in for quick access\n  - Filters for specific features: deposit-capable, drive-thru, 24/7 access, handicap accessible\n  - Provides turn-by-turn directions directly to your chosen ATM\n\n• Online ATM Finder:\n  - Visit our website's 'Locations' page\n  - Search by address, city, or postal code\n  - View ATMs on an interactive map with detailed information\n  - Plan your route before leaving home or office\n\n• Text Message Locator:\n  - Text your zip code to XXX-XXX for immediate nearby ATM locations\n  - Works with any mobile phone, even without smartphone capabilities\n\n• Fee-Free Network Information:\n  - Our extended ATM network includes partnerships with Allpoint®, MoneyPass®, and Star® networks\n  - Look for these logos on ATMs to avoid surcharge fees completely\n  - Our network includes convenient locations in retail stores, gas stations, and grocery chains\n\n• International ATM Access:\n  - Our cards work at millions of ATMs worldwide displaying the Visa®/Mastercard® logos\n  - Special travel notifications can be set through online banking before international trips\n\nWould you like me to help you locate ATMs near a specific address or with particular features?"
+      ]
+    },
+    {
+      "intent": "account_activation",
+      "patterns": [
+        "How do I activate my account?",
+        "Activate my new card",
+        "Help me set up my online banking",
+        "Enable my account",
+        "My account is inactive",
+        "Need to activate my new debit card",
+        "Start using my new credit card",
+        "Account activation process",
+        "How do I get started with my new account?",
+        "Activate my card",
+        "Set up mobile banking access",
+        "First time login to online banking",
+        "Initialize my account",
+        "Verify my new account",
+        "Activate joint account",
+        "Enable online access for business account",
+        "Set up biometric login",
+        "Register for digital banking",
+        "Activate international transactions",
+        "Enable contactless payments",
+        "Verify my identity for new account",
+        "Need activation code for online access",
+        "Enroll in digital banking",
+        "First-time setup instructions",
+        "Got a new card, how do I activate?",
+        "Setting up mobile deposit",
+        "Enable text banking",
+        "Change from inactive to active status",
+        "Activate newly opened account"
+      ],
+      "responses": [
+        "Congratulations on your new account or card! I'd be happy to guide you through the activation process to get you up and running quickly. Here's everything you need to know:\n\n1. Debit/Credit Card Activation:\n   • Call our secure activation hotline at 1-800-XXX-XXXX from your registered phone number\n   • Through our mobile app: Tap 'Card Management' → Select your card → Tap 'Activate'\n   • Visit any branch with photo ID\n   • At any ATM: Insert card, enter the PIN mailed separately, and follow prompts\n\n2. Online Banking Enrollment:\n   • Visit our website and click 'Enroll Now' or 'First Time User'\n   • You'll need your:\n     - Account number\n     - Social Security Number or Tax ID\n     - Date of birth\n     - Email address\n   • Create a username, password, and security questions\n   • Verify your identity via email or text code\n\n3. Mobile Banking Setup:\n   • Download our app from the App Store or Google Play\n   • Use your newly created online banking credentials to log in\n   • Set up biometric authentication (fingerprint/face ID) for faster access\n   • Activate mobile check deposit and other features\n\n4. Account Verification:\n   • Most accounts are verified during opening, but if additional verification is needed:\n     - Watch for small test deposits to your linked accounts\n     - Log in to verify the exact amounts\n\n5. Special Features Activation:\n   • International transactions: Call 1-800-XXX-XXXX or enable through the app\n   • Contactless payments: Available immediately with activated cards\n\nIs there a specific activation process I can walk you through step by step?",
+        
+        "Welcome to our banking family! I'm happy to guide you through activating your new account, card, or digital banking services. Our streamlined activation processes are designed for security and convenience:\n\n• New Debit/Credit Card Activation:\n  - Fastest method: Call 1-800-XXX-XXXX from your registered phone number\n  - Mobile app activation: Log in → 'Card Services' → 'Activate New Card'\n  - In-person: Visit any branch with government-issued ID\n  - Through ATM: Insert card, create PIN, and follow prompts\n  - Typical activation time: 2-5 minutes\n\n• Online Banking Registration:\n  - Visit our website and select 'First-Time User'\n  - Required information: Account number, SSN/TIN, date of birth\n  - Verification options: Email code, SMS code, or security questions\n  - Create credentials and set up multi-factor authentication\n  - You'll gain immediate access to account information and basic services\n\n• Mobile Banking Setup:\n  - Download our highly-rated app (iOS/Android)\n  - Use your online banking credentials or register directly through the app\n  - Enable biometric login for quick, secure access\n  - Customize your dashboard and alert preferences\n  - Access exclusive mobile features like card controls and mobile deposit\n\n• Enhanced Security Features:\n  - Set up account alerts for transactions over specified amounts\n  - Enable transaction notifications for real-time fraud monitoring\n  - Customize card controls for geographic restrictions and merchant types\n\nMany customers find that activating through our mobile app provides the quickest and most comprehensive experience. Would you like detailed instructions for any specific activation process?"
+      ]
+    },
+    {
+      "intent": "account_activation",
+      "patterns": [
+        "How do I activate my account?",
+        "Activate my new card",
+        "Help me set up my online banking",
+        "Enable my account",
+        "My account is inactive",
+        "Need to activate my new debit card",
+        "Start using my new credit card",
+        "Account activation process",
+        "How do I get started with my new account?",
+        "Activate my card",
+        "Set up mobile banking access",
+        "First time login to online banking",
+        "Initialize my account",
+        "Verify my new account",
+        "Activate joint account",
+        "Enable online access for business account",
+        "Set up biometric login",
+        "Register for digital banking",
+        "Activate international transactions",
+        "Enable contactless payments"
+      ],
+      "responses": [
+        "To activate your new account or card:\n1. Call our activation line at 1-800-XXX-XXXX\n2. Visit any branch with ID verification\n3. For debit/credit cards, you can also activate through our mobile app or ATM\n\nFor online banking setup, visit our website and click 'First Time User'.",
+        "New account and card activation is simple:\n- Call the number on the back of your card\n- Use our mobile app's 'Card Management' section\n- Visit a branch with proper identification\n\nFor online banking, use the 'Enroll Now' option on our homepage."
+      ]
+    },
+    {
+      "intent": "account_deactivation",
+      "patterns": [
+        "How do I close my account?",
+        "Deactivate my card",
+        "I want to close my account",
+        "Cancel my credit card",
+        "Suspend my account temporarily",
+        "Stop my card from working",
+        "Need to freeze my account",
+        "Close all my accounts",
+        "Temporarily block my card",
+        "Freeze account due to suspicious activity",
+        "Cancel automatic payments and close account",
+        "What's required to close my account?",
+        "Deactivate online banking access",
+        "Remove linked accounts",
+        "Close joint account",
+        "Suspend business account",
+        "Cancel recurring transfers and close account",
+        "Disable international transactions",
+        "Block contactless payments",
+        "Close account after settling balances"
+      ],
+      "responses": [
+        "To close an account or deactivate a card, please:\n1. Call our customer service at 1-800-XXX-XXXX\n2. Visit any branch with proper identification\n3. For temporary card freezes, use the 'Card Controls' feature in our mobile app\n\nNote: Before closing accounts, ensure all pending transactions are settled.",
+        "Account closure requires:\n- A visit to your local branch with ID\n- A call to our dedicated account services team\n- Ensuring your account has a zero balance\n\nTo temporarily freeze a card, use our mobile app's 'Card Controls' or online banking."
+      ]
+    },
+    {
+      "intent": "loan_status",
+      "patterns": [
+        "What's the status of my loan application?",
+        "Has my loan been approved?",
+        "Check my loan application",
+        "When will my loan be processed?",
+        "Updates on my loan application",
+        "Is my loan application still pending?",
+        "Tell me about my loan status",
+        "Has there been any progress with my loan?",
+        "Track my application",
+        "Check eligibility status for loan",
+        "View pending documents for loan",
+        "Status of loan disbursement",
+        "When will I receive my loan decision?",
+        "Check my refinance status",
+        "Loan modification status",
+        "View required documents for loan",
+        "Status of my preapproval",
+        "Check co-signer application status",
+        "Verify loan terms offered",
+        "Track multiple loan applications"
+      ],
+      "responses": [
+        "To check your loan application status:\n1. Log into online banking and go to 'Loans' > 'Applications'\n2. Call our loan department at 1-800-XXX-XXXX\n3. Visit a branch with your application ID\n\nTypically, loan decisions take 1-3 business days and you'll receive updates via email.",
+        "You can track your loan application through:\n- Your online banking portal under 'Loan Applications'\n- Our mobile app's loan center\n- Direct contact with your loan officer\n\nRemember to check your email regularly for status updates and document requests."
+      ]
+    },
+    {
+      "intent": "general_banking",
+      "patterns": [
+        "What are your working hours?",
+        "How do I deposit a check?",
+        "What's the current interest rate?",
+        "Do you offer services?",
+        "How long does a transaction take?",
+        "What documents do I need?",
+        "Explain banking terms",
+        "Help with mobile banking",
+        "What's your overdraft policy?",
+        "How do I order new checks?",
+        "Explain wire transfer fees",
+        "What's the minimum balance requirement?",
+        "How do I dispute a transaction?",
+        "Tell me about your savings accounts",
+        "What credit cards do you offer?",
+        "How do I set up direct deposit?",
+        "Explain mortgage rates",
+        "What investment options are available?",
+        "Tell me about business banking services",
+        "How do I change my address?",
+        "What are the foreign transaction fees?",
+        "How to deposit cash?",
+        "Explain your rewards program",
+        "What insurance products do you offer?",
+        "How to get a cashier's check?"
+      ],
+      "responses": [
+        "Our branch hours are typically Monday-Friday 9am-5pm and Saturday 9am-1pm. For specific services:\n- Mobile check deposit is available through our app\n- Current rates are available on our website\n- Direct deposit can be set up through your employer with our routing number\n\nFor more details, please visit our website or call customer service.",
+        "Here's some general banking information:\n- Most branches are open weekdays 9am-5pm\n- Mobile and online banking are available 24/7\n- Check deposits can be made via mobile app, ATM, or in branch\n- For current rates and fees, please visit our website's 'Rates & Fees' section\n\nNeed more specific information? Please contact our customer service team."
+      ]
+    }
+  ]
+}

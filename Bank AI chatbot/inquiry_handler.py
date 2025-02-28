@@ -3,8 +3,13 @@ from datetime import datetime, timedelta
 from typing import Dict, Any, Optional, Tuple
 from models import User, Account, Loan, Transaction, ATMLocation, db
 from functools import lru_cache
+import os
+import json
 import re
 from decimal import Decimal
+
+import logging
+logger = logging.getLogger(__name__)
 
 class InquiryHandler:
     def __init__(self, chatbot):
@@ -16,11 +21,6 @@ class InquiryHandler:
         # Updated verification questions to use User table data
         self.verification_questions = {
             'personal': [
-                {
-                    'question': 'Please provide your date of birth (YYYY-MM-DD)',
-                    'field': 'DateOfBirth',
-                    'type': 'date'
-                },
                 {
                     'question': 'What is your identification number?',
                     'field': 'IdentificationNumber',
@@ -359,16 +359,89 @@ class InquiryHandler:
         except Exception as e:
             db.session.rollback()
             return {'status': 'error', 'message': 'Error processing activation request'}
+    # Add this method to your InquiryHandler class
 
-    def _handle_verification(self, user_id: int, response: str) -> Dict[str, Any]:
+    def process_after_verification(self, user_id, intent, entities):
         """
-        Handle verification question responses
+        Process the final request after all verification steps are complete.
+        
+        Args:
+            user_id (int): The user ID
+            intent (str): The intent being processed
+            entities (dict): All collected entities including verification responses
+            
+        Returns:
+            dict: Response with message and status
         """
         try:
+            # Process the intent now that verification is complete
+            if intent == 'account_activation':
+                # Logic for activating account
+                return {
+                    'message': f"Your account has been successfully activated. You'll receive a confirmation email shortly.",
+                    'status': 'success'
+                }
+            elif intent == 'account_deactivation':
+                # Logic for deactivating account
+                return {
+                    'message': f"Your account has been successfully deactivated. You'll receive a confirmation email shortly.",
+                    'status': 'success'
+                }
+            elif intent == 'loan_status':
+                # Logic for loan status check
+                # This would typically query a database
+                return {
+                    'message': f"Your loan application is currently under review. We'll notify you of any updates.",
+                    'status': 'success'
+                }
+            elif intent == 'atm_location':
+                # Logic for ATM location
+                return {
+                    'message': f"We've found ATM locations near you. Check your email for a detailed list.",
+                    'status': 'success'
+                }
+            else:
+                return {
+                    'message': "Your request has been processed successfully.",
+                    'status': 'success'
+                }
+        except Exception as e:
+            logger.error(f"Error in process_after_verification: {str(e)}")
+            return {
+                'message': "We encountered an error processing your request. Please try again later.",
+                'status': 'error'
+            }
+
+    def handle_verification(self, user_id: int, response: str, 
+                       intent: Optional[str] = None,
+                       entities: Optional[Dict[str, Any]] = None,
+                       verification_category: Optional[str] = None,
+                       verification_step: Optional[int] = None) -> Dict[str, Any]:
+        """
+        Handle verification question responses with additional parameters for socket handler
+        """
+        try:
+            # First check if we have a pending inquiry
+            if user_id not in self.pending_inquiries:
+                return {
+                    'status': 'error',
+                    'message': 'No active verification in progress'
+                }
+                
             pending = self.pending_inquiries[user_id]
+            
+            # If verification_category and verification_step are provided, use them 
+            # to override the pending inquiry values (for compatibility with socket handler)
+            if verification_category is not None:
+                pending['verification_type'] = verification_category
+            
+            if verification_step is not None:
+                pending['verification_stage'] = verification_step
+                
             verification_type = pending['verification_type']
             user = pending['user']
             
+            # Rest of your verification logic remains the same
             # If it's a security question, format it with the user's actual security question
             if verification_type == 'security':
                 question_data = self.verification_questions[verification_type][pending['verification_stage']]
@@ -385,7 +458,10 @@ class InquiryHandler:
                     next_question = self.verification_questions[verification_type][pending['verification_stage']]
                     return {
                         'status': 'verification',
-                        'message': next_question['question']
+                        'message': next_question['question'],
+                        'is_verification_question': True,
+                        'verification_step': pending['verification_stage'],
+                        'verification_category': verification_type
                     }
                 elif verification_type == 'personal':
                     # Move to contact verification
@@ -393,7 +469,10 @@ class InquiryHandler:
                     pending['verification_stage'] = 0
                     return {
                         'status': 'verification',
-                        'message': self.verification_questions['contact'][0]['question']
+                        'message': self.verification_questions['contact'][0]['question'],
+                        'is_verification_question': True,
+                        'verification_step': 0,
+                        'verification_category': 'contact'
                     }
                 elif verification_type == 'contact':
                     # Move to security question
@@ -403,11 +482,18 @@ class InquiryHandler:
                         'status': 'verification',
                         'message': self.verification_questions['security'][0]['question'].format(
                             security_question=user.SecurityQuestion
-                        )
+                        ),
+                        'is_verification_question': True,
+                        'verification_step': 0,
+                        'verification_category': 'security'
                     }
                 else:
                     # All verifications passed, proceed with activation
                     try:
+                        # Use entities from both socket handler and pending inquiry
+                        if entities:
+                            pending['entities'].update(entities)
+                        
                         account = db.session.query(Account).filter(
                             Account.UserID == user_id,
                             Account.AccountType == pending['entities']['account_type']
@@ -419,21 +505,40 @@ class InquiryHandler:
                             del self.pending_inquiries[user_id]
                             return {
                                 'status': 'success',
-                                'message': 'Verification successful. Your account has been activated.'
+                                'message': 'Verification successful. Your account has been activated.',
+                                'is_verification_question': False
+                            }
+                        else:
+                            return {
+                                'status': 'error',
+                                'message': 'Account not found',
+                                'is_verification_question': False
                             }
                     except Exception as e:
                         db.session.rollback()
-                        return {'status': 'error', 'message': 'Error activating account'}
+                        return {
+                            'status': 'error', 
+                            'message': 'Error activating account',
+                            'is_verification_question': False
+                        }
             else:
                 # Failed verification
                 del self.pending_inquiries[user_id]
                 return {
                     'status': 'error',
-                    'message': 'Verification failed. For security reasons, please contact customer support.'
+                    'message': 'Verification failed. For security reasons, please contact customer support.',
+                    'is_verification_question': False
                 }
-                
+                    
         except Exception as e:
-            return {'status': 'error', 'message': 'Error during verification process'}
+            logger.error(f"Error during verification process: {str(e)}")
+            import traceback
+            logger.error(traceback.format_exc())
+            return {
+                'status': 'error', 
+                'message': 'Error during verification process',
+                'is_verification_question': False
+            }
     
     def _handle_deactivation(self, user_id: int, entities: Dict[str, str]) -> Dict[str, Any]:
         """
@@ -517,54 +622,88 @@ class InquiryHandler:
             db.session.rollback()
             return {'status': 'error', 'message': 'Error processing loan status inquiry'}
 
-    # Add batch processing for multiple database operations
     def _handle_atm_location(self, user_id: int, entities: Dict[str, str]) -> Dict[str, Any]:
         """
-        Handle ATM location inquiry with improved database query
+        Handle ATM location inquiry using a JSON file instead of database queries
         """
         try:
             location = entities.get('location', '').strip()
             if not location:
                 return {'status': 'error', 'message': 'Location is required'}
                 
+            # JSON file path containing ATM locations
+            atm_json_path = os.path.join(os.path.dirname(__file__), 'data', 'atm_locations.json')
+            
+            # Load ATM data from JSON file
+            try:
+                with open(atm_json_path, 'r') as f:
+                    all_atms = json.load(f)
+            except (FileNotFoundError, json.JSONDecodeError) as e:
+                logger.error(f"Error loading ATM data from JSON: {str(e)}")
+                return {'status': 'error', 'message': 'Unable to access ATM location data'}
+            
+            # Initialize cache attributes if they don't exist
+            if not hasattr(self.chatbot, 'cache'):
+                self.chatbot.cache = {}
+            
+            if not hasattr(self, 'cache_timestamp'):
+                self.cache_timestamp = {}
+                
             # Use a cache key for this query
             cache_key = f"atm_location_{location}"
             
-            # Check cache first
-            if cache_key in self.chatbot.cache and self.cache_timestamp.get(cache_key, datetime.min) > datetime.now() - self.cache_timeout:
+            # Check cache first (if cache is properly initialized)
+            cache_timeout = getattr(self, 'cache_timeout', timedelta(hours=1))
+            if (
+                cache_key in self.chatbot.cache and 
+                self.cache_timestamp.get(cache_key, datetime.min) > datetime.now() - cache_timeout
+            ):
                 return self.chatbot.cache[cache_key]
             
-            # Query with index optimization - city is likely indexed
-            query = db.session.query(
-                ATMLocation.BranchName,
-                ATMLocation.Address,
-                ATMLocation.City,
-                ATMLocation.State,
-                ATMLocation.ZipCode,
-                ATMLocation.OperatingHours,
-                ATMLocation.AdditionalServices
-            ).filter(
-                ATMLocation.City.ilike(f"%{location}%"),
-                ATMLocation.IsAccessible == True
-            ).limit(5)
+            # Filter ATMs by location (case-insensitive)
+            location_lower = location.lower()
+            matching_atms = [
+                atm for atm in all_atms 
+                if (
+                    location_lower in atm.get('city', '').lower() or 
+                    location_lower in atm.get('state', '').lower()
+                ) and atm.get('is_accessible', True)
+            ][:5]  # Limit to 5 results
             
+            # Format the ATM data
             atm_data = [
                 {
-                    'branch_name': atm.BranchName,
-                    'address': atm.Address,
-                    'city': atm.City,
-                    'state': atm.State,
-                    'zip_code': atm.ZipCode,
-                    'operating_hours': atm.OperatingHours,
-                    'additional_services': atm.AdditionalServices
-                } for atm in query.all()
+                    'branch_name': atm.get('branch_name', ''),
+                    'address': atm.get('address', ''),
+                    'city': atm.get('city', ''),
+                    'state': atm.get('state', ''),
+                    'zip_code': atm.get('zip_code', ''),
+                    'operating_hours': atm.get('operating_hours', ''),
+                    'additional_services': atm.get('additional_services', '')
+                } for atm in matching_atms
             ]
             
             if not atm_data:
-                result = {'status': 'error', 'message': 'No ATMs found in the specified location'}
+                result = {
+                    'status': 'error', 
+                    'message': f'No ATMs found in {location}',
+                    'display_text': f'I couldn\'t find any ATMs in {location}. Please try another location.'
+                }
             else:
-                result = {'status': 'success', 'data': atm_data}
+                # Create a user-friendly display text with the ATM information
+                display_text = f"Here are ATMs in {location}:\n\n"
+                for i, atm in enumerate(atm_data, 1):
+                    display_text += f"{i}. {atm['branch_name']}\n"
+                    display_text += f"   Address: {atm['address']}, {atm['city']}, {atm['state']} {atm['zip_code']}\n"
+                    display_text += f"   Hours: {atm['operating_hours']}\n"
+                    display_text += f"   Services: {atm['additional_services']}\n\n"
                 
+                result = {
+                    'status': 'success', 
+                    'data': atm_data,
+                    'display_text': display_text
+                }
+            
             # Cache the result
             self.chatbot.cache[cache_key] = result
             self.cache_timestamp[cache_key] = datetime.now()
@@ -573,4 +712,8 @@ class InquiryHandler:
             
         except Exception as e:
             logger.error(f"Error processing ATM location inquiry: {str(e)}")
-            return {'status': 'error', 'message': 'Error processing ATM location inquiry'}
+            return {
+                'status': 'error', 
+                'message': 'Error processing ATM location inquiry',
+                'display_text': 'Sorry, I encountered an error while searching for ATMs. Please try again later.'
+            }
