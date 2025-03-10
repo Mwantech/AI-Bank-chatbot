@@ -67,3 +67,87 @@ force_end_session: Forcefully end the current chat session (requires token).
 License
 This project is licensed under the MIT License. See the LICENSE file for details.
 
+# Banking Chatbot
+
+A conversational AI chatbot for banking services built with Python. The chatbot can handle customer inquiries, provide ATM locations, and process various banking-related requests.
+
+## Features
+
+- Natural language processing for customer inquiries
+- ATM location service
+- Secure authentication system
+- Intent classification and entity recognition
+- Database integration for persistent storage
+
+## Project Structure
+
+- `app.py` - Main application entry point
+- `auth.py` - Authentication and user management
+- `chat.py` & `chat2.py` - Chatbot conversation handling
+- `chatbot.py` - Core chatbot logic
+- `inquiry_handler.py` - Customer inquiry processing
+- `models.py` - Database models and schemas
+
+## Setup
+
+1. Install dependencies:
+```sh
+pip install -r requirements.txt
+```
+
+2. Set up environment variables:
+```sh
+cp .env.example .env
+python generate_secret_key.py
+```
+
+3. Initialize the database:
+```sh
+sqlite3 instance/banking_chatbot.db < database.sql
+```
+
+## Training the Model
+
+To train or retrain the chatbot model:
+
+```sh
+python train_model.py
+```
+
+This will generate model files in the `models/` directory including:
+- Intent classifier
+- Entity recognition model
+- Label encoders
+- Vectorizers
+
+## Data Files
+
+- `data/intents.json` - Training data for chatbot responses
+- `data/atm_locations.json` - ATM location information
+- `database.sql` - Database schema
+
+## Running the Application
+
+```sh
+python app.py
+```
+
+The chatbot will start and be ready to process user inquiries.
+
+## Model Components
+
+The system uses several trained models stored in the `models/` directory:
+- `classifier.pkl` - Main intent classification model
+- `entities.pkl` - Entity recognition model
+- `label_encoder.pkl` - Encodes intent labels
+- `vectorizer.pkl` - Text vectorization model
+- `responses.pkl` - Response template storage
+- `required_entities.pkl` - Required entities for each intent
+
+## License
+
+[Add your license here]
+
+## Contributing
+
+[Add contribution guidelines here]
