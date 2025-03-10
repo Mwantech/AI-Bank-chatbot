@@ -29,6 +29,12 @@ CREATE TABLE Accounts (
     FOREIGN KEY (UserID) REFERENCES Users(UserID)
 );
 
+INSERT INTO Accounts (UserID, AccountType, AccountNumber, Balance)
+VALUES
+(2, 'Checking', 'ACC-2025-201', 5000.00),
+(2, 'Savings', 'ACC-2025-202', 15000.00),
+(2, 'Investment', 'ACC-2025-203', 25000.00);
+
 -- Transactions Table
 CREATE TABLE Transactions (
     TransactionID INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -41,21 +47,39 @@ CREATE TABLE Transactions (
     FOREIGN KEY (AccountID) REFERENCES Accounts(AccountID)
 );
 
--- Loans Table
 CREATE TABLE Loans (
-    LoanID INTEGER PRIMARY KEY AUTOINCREMENT,
+    LoanID INTEGER PRIMARY KEY AUTO_INCREMENT,
     UserID INTEGER NOT NULL,
+    ApplicationID VARCHAR(50) UNIQUE NOT NULL,
     LoanType VARCHAR(50) NOT NULL,
-    LoanAmount DECIMAL(15, 2) NOT NULL,
-    InterestRate DECIMAL(5, 2) NOT NULL,
-    LoanTerm INTEGER NOT NULL,
+    RequestedAmount DECIMAL(15, 2) NOT NULL,
+    ApprovedAmount DECIMAL(15, 2),
+    InterestRate DECIMAL(5, 2),
+    TermMonths INTEGER,
+    Status VARCHAR(20) DEFAULT 'Pending',
     ApplicationDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    ApprovalStatus VARCHAR(20) DEFAULT 'Pending',
-    StartDate TIMESTAMP,
-    EndDate TIMESTAMP,
+    ApprovalDate TIMESTAMP NULL DEFAULT NULL,
+    Purpose VARCHAR(200),
+    CollateralDetails VARCHAR(200),
+    CreditScore INTEGER,
+    StartDate TIMESTAMP NULL DEFAULT NULL,
+    EndDate TIMESTAMP NULL DEFAULT NULL,
     RemainingBalance DECIMAL(15, 2),
     FOREIGN KEY (UserID) REFERENCES Users(UserID)
 );
+
+INSERT INTO Loans (
+    UserID, ApplicationID, LoanType, RequestedAmount, ApprovedAmount, InterestRate, TermMonths, 
+    Status, ApplicationDate, ApprovalDate, Purpose, CollateralDetails, CreditScore, StartDate, EndDate, RemainingBalance
+)
+VALUES 
+(1, 'APP-2025-101', 'Personal', 12000.00, 11500.00, 6.50, 48, 'Approved', '2025-03-10 09:00:00', '2025-03-15 14:00:00', 'Medical expenses', NULL, 730, '2025-04-01 00:00:00', '2029-04-01 00:00:00', 11500.00),
+(1, 'APP-2025-102', 'Auto', 22000.00, 21000.00, 4.90, 60, 'Approved', '2025-03-11 10:15:00', '2025-03-16 11:30:00', 'Car repair and upgrade', 'Vehicle: 2019 Ford Focus', 690, '2025-04-05 00:00:00', '2030-04-05 00:00:00', 21000.00),
+(2, 'APP-2025-103', 'Home', 350000.00, 340000.00, 3.85, 360, 'Approved', '2025-03-12 14:30:00', '2025-03-20 12:45:00', 'Refinancing home', 'Property: 456 Oak St, Hometown', 780, '2025-04-10 00:00:00', '2055-04-10 00:00:00', 340000.00),
+(2, 'APP-2025-104', 'Business', 90000.00, NULL, NULL, NULL, 'Pending', '2025-03-13 11:00:00', NULL, 'Expansion of operations', 'Equipment and inventory', 710, NULL, NULL, NULL),
+(1, 'APP-2025-105', 'Personal', 18000.00, 17000.00, 5.95, 60, 'Approved', '2025-03-14 16:45:00', '2025-03-19 10:20:00', 'Vacation loan', NULL, 705, '2025-04-15 00:00:00', '2029-04-15 00:00:00', 17000.00),
+(2, 'APP-2025-106', 'Auto', 27000.00, NULL, NULL, NULL, 'Rejected', '2025-03-15 09:20:00', '2025-03-20 15:30:00', 'Upgrade to electric vehicle', 'Vehicle: 2023 Nissan Leaf', 650, NULL, NULL, NULL);
+
 
 -- ATM Locations Table
 CREATE TABLE ATMLocations (

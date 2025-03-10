@@ -1,7 +1,7 @@
 from sqlalchemy import text
 from datetime import datetime, timedelta
 from typing import Dict, Any, Optional, Tuple
-from models import User, Account, Loan, Transaction, ATMLocation, db
+from models import User, Account, Loan, Transaction, ATMLocation, db, ChatSession, ChatMessage
 from functools import lru_cache
 import os
 import json
@@ -18,7 +18,7 @@ class InquiryHandler:
         self.cache_timeout = timedelta(hours=1)
         self.cache_timestamp = {}
         
-        # Updated verification questions to use User table data
+        # Updated verification questions to match User table fields from models.py
         self.verification_questions = {
             'personal': [
                 {
@@ -215,7 +215,7 @@ class InquiryHandler:
             return False
             
         except Exception as e:
-            print(f"Verification error: {str(e)}")
+            logger.error(f"Verification error: {str(e)}")
             return False
 
     def _normalize_response(self, value: str, field_type: str) -> str:
@@ -282,6 +282,7 @@ class InquiryHandler:
     def _get_account_field_value(self, account: Account, field_name: str) -> Any:
         """
         Get the actual value from the database for verification
+        Updated to match Account model fields from models.py
         """
         try:
             if field_name == 'last_transaction_amount':
@@ -291,44 +292,113 @@ class InquiryHandler:
                              .first())
                 return transaction.Amount if transaction else None
                 
+            # Note: OpeningDate is not in Account model, using CreatedAt instead
             elif field_name == 'opening_date':
-                return account.OpeningDate
+                return account.CreatedAt
                 
             elif field_name == 'last_deposit_amount':
                 deposit = (db.session.query(Transaction)
                          .filter(Transaction.AccountID == account.AccountID,
-                                Transaction.TransactionType == 'deposit')
+                                Transaction.Type == 'deposit')  # Changed from TransactionType to Type
                          .order_by(Transaction.TransactionDate.desc())
                          .first())
                 return deposit.Amount if deposit else None
                 
-            elif field_name == 'linked_account':
-                return account.LinkedAccountNumber
+            # These fields don't exist in Account model
+            # You should either add them to the model or remove these checks
+            elif field_name in ['linked_account', 'credit_limit', 'portfolio_id', 'advisor_name']:
+                return None
                 
             elif field_name == 'last_payment_date':
                 payment = (db.session.query(Transaction)
                          .filter(Transaction.AccountID == account.AccountID,
-                                Transaction.TransactionType == 'payment')
+                                Transaction.Type == 'payment')  # Changed from TransactionType to Type
                          .order_by(Transaction.TransactionDate.desc())
                          .first())
                 return payment.TransactionDate if payment else None
                 
-            elif field_name == 'credit_limit':
-                return account.CreditLimit
-                
-            elif field_name == 'portfolio_id':
-                return account.PortfolioID
-                
-            elif field_name == 'advisor_name':
-                return account.AdvisorName
-                
             return None
             
         except Exception as e:
-            print(f"Error getting field value: {str(e)}")
+            logger.error(f"Error getting field value: {str(e)}")
             return None
 
-    
+    def _handle_verification(self, user_id: int, response: str) -> Dict[str, Any]:
+        """
+        Internal method to handle verification steps
+        """
+        try:
+            pending = self.pending_inquiries[user_id]
+            verification_type = pending['verification_type']
+            user = pending['user']
+            stage = pending['verification_stage']
+            
+            # If it's a security question, format it with the user's actual security question
+            if verification_type == 'security':
+                question_data = self.verification_questions[verification_type][stage]
+                question = question_data['question'].format(security_question=user.SecurityQuestion)
+            else:
+                question_data = self.verification_questions[verification_type][stage]
+                question = question_data['question']
+            
+            # Verify response
+            if self._verify_response(verification_type, stage, response, user):
+                # Move to next stage or type of verification
+                if stage < len(self.verification_questions[verification_type]) - 1:
+                    # More questions in current type
+                    pending['verification_stage'] += 1
+                    next_question = self.verification_questions[verification_type][pending['verification_stage']]
+                    
+                    if verification_type == 'security':
+                        next_question_text = next_question['question'].format(security_question=user.SecurityQuestion)
+                    else:
+                        next_question_text = next_question['question']
+                        
+                    return {
+                        'status': 'verification',
+                        'message': next_question_text
+                    }
+                elif verification_type == 'personal':
+                    # Move to contact verification
+                    pending['verification_type'] = 'contact'
+                    pending['verification_stage'] = 0
+                    return {
+                        'status': 'verification',
+                        'message': self.verification_questions['contact'][0]['question']
+                    }
+                elif verification_type == 'contact':
+                    # Move to security question
+                    pending['verification_type'] = 'security'
+                    pending['verification_stage'] = 0
+                    security_question = self.verification_questions['security'][0]['question'].format(
+                        security_question=user.SecurityQuestion
+                    )
+                    return {
+                        'status': 'verification',
+                        'message': security_question
+                    }
+                else:
+                    # All verifications passed, proceed with intended action
+                    intent = pending['intent']
+                    entities = pending['entities']
+                    del self.pending_inquiries[user_id]
+                    return self.process_after_verification(user_id, intent, entities)
+            else:
+                # Failed verification
+                del self.pending_inquiries[user_id]
+                return {
+                    'status': 'error',
+                    'message': 'Verification failed. For security reasons, please contact customer support.'
+                }
+                    
+        except Exception as e:
+            logger.error(f"Error during verification process: {str(e)}")
+            import traceback
+            logger.error(traceback.format_exc())
+            return {
+                'status': 'error', 
+                'message': 'Error during verification process'
+            }
 
     def _handle_activation(self, user_id: int, entities: Dict[str, str]) -> Dict[str, Any]:
         """
@@ -358,8 +428,8 @@ class InquiryHandler:
             
         except Exception as e:
             db.session.rollback()
+            logger.error(f"Error processing activation request: {str(e)}")
             return {'status': 'error', 'message': 'Error processing activation request'}
-    # Add this method to your InquiryHandler class
 
     def process_after_verification(self, user_id, intent, entities):
         """
@@ -377,39 +447,87 @@ class InquiryHandler:
             # Process the intent now that verification is complete
             if intent == 'account_activation':
                 # Logic for activating account
-                return {
-                    'message': f"Your account has been successfully activated. You'll receive a confirmation email shortly.",
-                    'status': 'success'
-                }
+                account = db.session.query(Account).filter(
+                    Account.UserID == user_id,
+                    Account.AccountType == entities.get('account_type', ''),
+                    Account.AccountNumber == entities.get('account_number', '')
+                ).first()
+                
+                if account:
+                    account.Status = 'Active'
+                    db.session.commit()
+                    return {
+                        'status': 'success',
+                        'message': f"Your account has been successfully activated. You'll receive a confirmation email shortly."
+                    }
+                else:
+                    return {
+                        'status': 'error',
+                        'message': 'Account not found'
+                    }
+                    
             elif intent == 'account_deactivation':
                 # Logic for deactivating account
-                return {
-                    'message': f"Your account has been successfully deactivated. You'll receive a confirmation email shortly.",
-                    'status': 'success'
-                }
+                account = db.session.query(Account).filter(
+                    Account.UserID == user_id,
+                    Account.AccountType == entities.get('account_type', ''),
+                    Account.AccountNumber == entities.get('account_number', '')
+                ).first()
+                
+                if account:
+                    account.Status = 'Inactive'
+                    db.session.commit()
+                    return {
+                        'status': 'success',
+                        'message': f"Your account has been successfully deactivated. You'll receive a confirmation email shortly."
+                    }
+                else:
+                    return {
+                        'status': 'error',
+                        'message': 'Account not found'
+                    }
+                    
             elif intent == 'loan_status':
                 # Logic for loan status check
-                # This would typically query a database
-                return {
-                    'message': f"Your loan application is currently under review. We'll notify you of any updates.",
-                    'status': 'success'
-                }
+                loan = db.session.query(Loan).filter(
+                    Loan.UserID == user_id,
+                    Loan.ApplicationID == entities.get('application_id', '')
+                ).first()
+                
+                if loan:
+                    return {
+                        'status': 'success',
+                        'message': f"Your loan application is currently {loan.Status}. We'll notify you of any updates.",
+                        'data': {
+                            'loan_type': loan.LoanType,
+                            'status': loan.Status,
+                            'requested_amount': float(loan.RequestedAmount),
+                            'approved_amount': float(loan.ApprovedAmount) if loan.ApprovedAmount else None,
+                            'application_date': loan.ApplicationDate.strftime('%Y-%m-%d')
+                        }
+                    }
+                else:
+                    return {
+                        'status': 'error',
+                        'message': 'Loan application not found'
+                    }
+                    
             elif intent == 'atm_location':
                 # Logic for ATM location
-                return {
-                    'message': f"We've found ATM locations near you. Check your email for a detailed list.",
-                    'status': 'success'
-                }
+                return self._handle_atm_location(user_id, entities)
+                
             else:
                 return {
-                    'message': "Your request has been processed successfully.",
-                    'status': 'success'
+                    'status': 'error',
+                    'message': "Unsupported request type."
                 }
+                
         except Exception as e:
             logger.error(f"Error in process_after_verification: {str(e)}")
+            db.session.rollback()
             return {
-                'message': "We encountered an error processing your request. Please try again later.",
-                'status': 'error'
+                'status': 'error',
+                'message': "We encountered an error processing your request. Please try again later."
             }
 
     def handle_verification(self, user_id: int, response: str, 
@@ -441,24 +559,32 @@ class InquiryHandler:
             verification_type = pending['verification_type']
             user = pending['user']
             
-            # Rest of your verification logic remains the same
+            # Get the question data
+            stage = pending['verification_stage']
+            question_data = self.verification_questions[verification_type][stage]
+            
             # If it's a security question, format it with the user's actual security question
             if verification_type == 'security':
-                question_data = self.verification_questions[verification_type][pending['verification_stage']]
                 question = question_data['question'].format(security_question=user.SecurityQuestion)
             else:
-                question_data = self.verification_questions[verification_type][pending['verification_stage']]
+                question = question_data['question']
             
             # Verify response
-            if self._verify_response(verification_type, pending['verification_stage'], response, user):
+            if self._verify_response(verification_type, stage, response, user):
                 # Move to next stage or type of verification
-                if pending['verification_stage'] < len(self.verification_questions[verification_type]) - 1:
+                if stage < len(self.verification_questions[verification_type]) - 1:
                     # More questions in current type
                     pending['verification_stage'] += 1
                     next_question = self.verification_questions[verification_type][pending['verification_stage']]
+                    
+                    if verification_type == 'security':
+                        next_question_text = next_question['question'].format(security_question=user.SecurityQuestion)
+                    else:
+                        next_question_text = next_question['question']
+                        
                     return {
                         'status': 'verification',
-                        'message': next_question['question'],
+                        'message': next_question_text,
                         'is_verification_question': True,
                         'verification_step': pending['verification_stage'],
                         'verification_category': verification_type
@@ -478,11 +604,12 @@ class InquiryHandler:
                     # Move to security question
                     pending['verification_type'] = 'security'
                     pending['verification_stage'] = 0
+                    security_question = self.verification_questions['security'][0]['question'].format(
+                        security_question=user.SecurityQuestion
+                    )
                     return {
                         'status': 'verification',
-                        'message': self.verification_questions['security'][0]['question'].format(
-                            security_question=user.SecurityQuestion
-                        ),
+                        'message': security_question,
                         'is_verification_question': True,
                         'verification_step': 0,
                         'verification_category': 'security'
@@ -494,31 +621,21 @@ class InquiryHandler:
                         if entities:
                             pending['entities'].update(entities)
                         
-                        account = db.session.query(Account).filter(
-                            Account.UserID == user_id,
-                            Account.AccountType == pending['entities']['account_type']
-                        ).first()
+                        # Process the request based on intent
+                        intent = pending['intent']
+                        entities = pending['entities']
+                        del self.pending_inquiries[user_id]
                         
-                        if account:
-                            account.Status = 'Active'
-                            db.session.commit()
-                            del self.pending_inquiries[user_id]
-                            return {
-                                'status': 'success',
-                                'message': 'Verification successful. Your account has been activated.',
-                                'is_verification_question': False
-                            }
-                        else:
-                            return {
-                                'status': 'error',
-                                'message': 'Account not found',
-                                'is_verification_question': False
-                            }
+                        result = self.process_after_verification(user_id, intent, entities)
+                        result['is_verification_question'] = False
+                        return result
+                        
                     except Exception as e:
                         db.session.rollback()
+                        logger.error(f"Error after verification: {str(e)}")
                         return {
                             'status': 'error', 
-                            'message': 'Error activating account',
+                            'message': f'Error processing request: {str(e)}',
                             'is_verification_question': False
                         }
             else:
@@ -567,9 +684,10 @@ class InquiryHandler:
             
         except Exception as e:
             db.session.rollback()
+            logger.error(f"Error processing deactivation request: {str(e)}")
             return {'status': 'error', 'message': 'Error processing deactivation request'}
     
-        # Add caching for frequently accessed data
+    # Add caching for frequently accessed data
     @lru_cache(maxsize=128)
     def _get_required_entities(self, intent: str) -> list:
         """
@@ -583,44 +701,108 @@ class InquiryHandler:
         }
         return requirements.get(intent, [])
 
-    # Optimize database queries with filter optimization
     def _handle_loan_status(self, user_id: int, entities: Dict[str, str]) -> Dict[str, Any]:
         """
         Handle loan status inquiry with optimized database query
         """
         try:
+            # Log the incoming request
+            logger.info(f"Processing loan status for user_id: {user_id}, entities: {entities}")
+            
             # Use more specific queries with indexable fields first
             filters = [Loan.UserID == user_id]
             
             if 'application_id' in entities:
                 filters.append(Loan.ApplicationID == entities['application_id'])
+                logger.debug(f"Adding application_id filter: {entities['application_id']}")
             
             if 'loan_type' in entities:
                 filters.append(Loan.LoanType == entities['loan_type'])
+                logger.debug(f"Adding loan_type filter: {entities['loan_type']}")
             
             # Execute optimized query
             loan = db.session.query(Loan).filter(*filters).first()
             
             if not loan:
+                logger.warning(f"No loan found for filters: {filters}")
                 return {'status': 'error', 'message': 'Loan application not found'}
             
-            # Use SQLAlchemy's defer() for fields not immediately needed
-            return {
-                'status': 'success',
-                'data': {
-                    'loan_type': loan.LoanType,
-                    'status': loan.Status,
-                    'requested_amount': float(loan.RequestedAmount),
-                    'approved_amount': float(loan.ApprovedAmount) if loan.ApprovedAmount else None,
-                    'interest_rate': float(loan.InterestRate) if loan.InterestRate else None,
-                    'application_date': loan.ApplicationDate.strftime('%Y-%m-%d')
-                }
+            logger.info(f"Loan found: ID={loan.LoanID}, Status={loan.Status}")
+            
+            # Prepare response with all relevant loan data
+            response_data = {
+                'loan_id': loan.LoanID,
+                'application_id': loan.ApplicationID,
+                'loan_type': loan.LoanType,
+                'status': loan.Status,
+                'requested_amount': float(loan.RequestedAmount),
             }
             
+            # Format dates only if they are datetime objects
+            if loan.ApplicationDate:
+                if isinstance(loan.ApplicationDate, str):
+                    response_data['application_date'] = loan.ApplicationDate
+                else:
+                    response_data['application_date'] = loan.ApplicationDate.strftime('%Y-%m-%d')
+            
+            # Add conditional fields based on loan data availability
+            if loan.ApprovedAmount is not None:
+                response_data['approved_amount'] = float(loan.ApprovedAmount)
+            
+            if loan.InterestRate is not None:
+                response_data['interest_rate'] = float(loan.InterestRate)
+                
+            if loan.TermMonths is not None:
+                response_data['term_months'] = loan.TermMonths
+                
+            if loan.ApprovalDate:
+                if isinstance(loan.ApprovalDate, str):
+                    response_data['approval_date'] = loan.ApprovalDate
+                else:
+                    response_data['approval_date'] = loan.ApprovalDate.strftime('%Y-%m-%d')
+                
+            if loan.Purpose:
+                response_data['purpose'] = loan.Purpose
+                
+            if loan.CollateralDetails:
+                response_data['collateral_details'] = loan.CollateralDetails
+                
+            if loan.CreditScore:
+                response_data['credit_score'] = loan.CreditScore
+                
+            if loan.StartDate:
+                if isinstance(loan.StartDate, str):
+                    response_data['start_date'] = loan.StartDate
+                else:
+                    response_data['start_date'] = loan.StartDate.strftime('%Y-%m-%d')
+                
+            if loan.EndDate:
+                if isinstance(loan.EndDate, str):
+                    response_data['end_date'] = loan.EndDate
+                else:
+                    response_data['end_date'] = loan.EndDate.strftime('%Y-%m-%d')
+                
+            if loan.RemainingBalance is not None:
+                response_data['remaining_balance'] = float(loan.RemainingBalance)
+            
+            # Log the complete response data before returning
+            logger.info(f"Returning loan data: {response_data}")
+            
+            result = {
+                'status': 'success',
+                'data': response_data,
+                'message': f"Loan status for {entities.get('application_id', 'your application')}: {loan.Status}"
+            }
+            
+            return result
+            
         except Exception as e:
-            logger.error(f"Error processing loan status inquiry: {str(e)}")
+            error_msg = f"Error processing loan status inquiry: {str(e)}"
+            logger.error(error_msg)
+            logger.exception("Full exception details:")
             db.session.rollback()
             return {'status': 'error', 'message': 'Error processing loan status inquiry'}
+    
 
     def _handle_atm_location(self, user_id: int, entities: Dict[str, str]) -> Dict[str, Any]:
         """

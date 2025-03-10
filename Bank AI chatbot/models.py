@@ -52,22 +52,24 @@ class Transaction(db.Model):
 class Loan(db.Model):
     __tablename__ = 'loans'
     
-    LoanID = db.Column(db.Integer, primary_key=True)
+    LoanID = db.Column(db.Integer, primary_key=True, autoincrement=True)
     UserID = db.Column(db.Integer, db.ForeignKey('users.UserID'), nullable=False)
     ApplicationID = db.Column(db.String(50), unique=True, nullable=False)
     LoanType = db.Column(db.String(50), nullable=False)  # Personal, Home, Auto, Business
     RequestedAmount = db.Column(db.Numeric(15, 2), nullable=False)
-    ApprovedAmount = db.Column(db.Numeric(15, 2))
-    InterestRate = db.Column(db.Numeric(5, 2))
-    TermMonths = db.Column(db.Integer)
-    Status = db.Column(db.String(20), default='Pending')  # Pending, Approved, Rejected
+    ApprovedAmount = db.Column(db.Numeric(15, 2), nullable=True)
+    InterestRate = db.Column(db.Numeric(5, 2), nullable=True)
+    TermMonths = db.Column(db.Integer, nullable=True)
+    Status = db.Column(db.String(20), default='Pending')
     ApplicationDate = db.Column(db.DateTime, default=datetime.utcnow)
-    ApprovalDate = db.Column(db.DateTime)
+    ApprovalDate = db.Column(db.DateTime, nullable=True)
+    Purpose = db.Column(db.String(200), nullable=True)
+    CollateralDetails = db.Column(db.String(200), nullable=True)
+    CreditScore = db.Column(db.Integer, nullable=True)
+    StartDate = db.Column(db.DateTime, nullable=True)
+    EndDate = db.Column(db.DateTime, nullable=True)
+    RemainingBalance = db.Column(db.Numeric(15, 2), nullable=True)
     
-    # Additional loan details
-    Purpose = db.Column(db.String(200))
-    CollateralDetails = db.Column(db.String(200))
-    CreditScore = db.Column(db.Integer)
 
 class ATMLocation(db.Model):
     __tablename__ = 'atm_locations'

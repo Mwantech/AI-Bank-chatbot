@@ -61,7 +61,13 @@ def start_chat_session(current_user):
             'user_id': str(current_user.UserID),
             'current_intent': None,
             'collected_entities': {},
-            'missing_entities': []
+            'missing_entities': [],
+            # When verification is active, these keys are used:
+            'verification_step': None,   # zero-indexed step (None means inactive)
+            'verification_category': None,
+            # For intent switching confirmation
+            'awaiting_confirmation': False,
+            'confirmation_type': None
         }
         
         return jsonify({
@@ -85,8 +91,6 @@ def register_socket_handlers(socketio_instance):
     @socketio_instance.on('disconnect')
     def handle_disconnect():
         logger.info("Client disconnected")
-
-    # In your chat.py file, update the handle_message function
 
     @socketio_instance.on('message')
     @socket_auth_required
@@ -118,12 +122,13 @@ def register_socket_handlers(socketio_instance):
                     'current_intent': None,
                     'collected_entities': {},
                     'missing_entities': [],
-                    'verification_step': 0,
-                    'verification_category': None
+                    'verification_step': None,
+                    'verification_category': None,
+                    'awaiting_confirmation': False,
+                    'confirmation_type': None
                 }
                 active_sessions[str(session_id)] = session_state
             
-            # Log the current session state for debugging
             logger.info(f"Session state before processing: {session_state}")
             
             # Check if we're in the middle of collecting entities
@@ -153,7 +158,6 @@ def register_socket_handlers(socketio_instance):
                         logger.info(f"Processing {intent} with entities: {all_entities}")
                         
                         try:
-                            # Use InquiryHandler to process the request
                             inquiry_response = inquiry_handler.handle_inquiry(
                                 int(current_user.UserID),
                                 message,
@@ -164,20 +168,17 @@ def register_socket_handlers(socketio_instance):
                             if inquiry_response:
                                 # Prevent switching to goodbye intent during active entity collection
                                 if intent in ['account_activation', 'account_deactivation', 'loan_status', 'atm_location'] and not inquiry_response.get('process_complete', False):
-                                    # Force continuation of the current intent flow
                                     response_text = inquiry_response.get('display_text', inquiry_response.get('message', 'Request processed'))
                                     missing_fields = inquiry_response.get('missing_fields', [])
                                     
-                                    # Update session state with any new missing fields
                                     if missing_fields:
                                         session_state['missing_entities'] = missing_fields
                                     
-                                    # Store message with the intent preserved as the original intent
                                     chat_message = ChatMessage(
                                         SessionID=session_id,
                                         Message=message,
                                         Response=response_text,
-                                        Intent=intent  # Preserve the original intent
+                                        Intent=intent
                                     )
                                     db.session.add(chat_message)
                                     db.session.commit()
@@ -185,10 +186,10 @@ def register_socket_handlers(socketio_instance):
                                     emit('response', {
                                         'message_id': chat_message.MessageID,
                                         'response': response_text,
-                                        'intent': intent,  # Keep the original intent
+                                        'intent': intent,
                                         'entities': all_entities,
                                         'missing_entities': missing_fields if missing_fields else [],
-                                        'conversation_active': True  # Force conversation to stay active
+                                        'conversation_active': True
                                     })
                                     logger.info(f"Session state after entity processing: {session_state}")
                                     return
@@ -198,11 +199,10 @@ def register_socket_handlers(socketio_instance):
                                 
                                 # Check if this is a verification question
                                 if inquiry_response.get('is_verification_question'):
-                                    # Update verification state
+                                    # Set up verification state using a zero-index approach
                                     session_state['verification_step'] = inquiry_response.get('verification_step', 0)
                                     session_state['verification_category'] = inquiry_response.get('verification_category')
                                     
-                                    # Store and emit response
                                     chat_message = ChatMessage(
                                         SessionID=session_id,
                                         Message=message,
@@ -222,7 +222,6 @@ def register_socket_handlers(socketio_instance):
                                     })
                                     logger.info(f"Session state after verification setup: {session_state}")
                                     return
-                                # If still incomplete, update missing entities
                                 elif missing_fields:
                                     session_state['missing_entities'] = missing_fields
                                     response_data = {
@@ -232,14 +231,12 @@ def register_socket_handlers(socketio_instance):
                                         'missing_entities': missing_fields
                                     }
                                 else:
-                                    # Request completed successfully
                                     response_data = {
                                         'response': response_text,
                                         'intent': intent,
                                         'entities': all_entities
                                     }
-                                    
-                                # Store message with the actual response from inquiry handler
+                                
                                 chat_message = ChatMessage(
                                     SessionID=session_id,
                                     Message=message,
@@ -261,24 +258,20 @@ def register_socket_handlers(socketio_instance):
                                 return
                         except Exception as e:
                             logger.error(f"Error processing inquiry: {str(e)}")
-                            # Add stack trace for better debugging
                             import traceback
                             logger.error(traceback.format_exc())
                             emit('error', {'message': f'Failed to process inquiry: {str(e)}'})
                             return
                 else:
-                    # If we couldn't match entities, maybe it's freeform input or a single value
+                    # Handle freeform or single entity input
                     if len(session_state['missing_entities']) == 1:
-                        # If only one entity is missing, treat the whole message as that entity
                         entity_name = session_state['missing_entities'][0]
                         session_state['collected_entities'][entity_name] = message
                         
-                        # Process with the single entity
                         intent = session_state['current_intent']
                         all_entities = session_state['collected_entities']
                         session_state['missing_entities'] = []
                         
-                        # Process the inquiry with the updated entities
                         if intent in ['account_activation', 'account_deactivation', 'loan_status', 'atm_location']:
                             try:
                                 inquiry_response = inquiry_handler.handle_inquiry(
@@ -289,22 +282,18 @@ def register_socket_handlers(socketio_instance):
                                 )
                                 
                                 if inquiry_response:
-                                    # Prevent switching to goodbye intent during active entity collection
                                     if intent in ['account_activation', 'account_deactivation', 'loan_status', 'atm_location'] and not inquiry_response.get('process_complete', False):
-                                        # Force continuation of the current intent flow
                                         response_text = inquiry_response.get('display_text', inquiry_response.get('message', 'Request processed'))
                                         missing_fields = inquiry_response.get('missing_fields', [])
                                         
-                                        # Update session state with any new missing fields
                                         if missing_fields:
                                             session_state['missing_entities'] = missing_fields
                                         
-                                        # Store message with the intent preserved as the original intent
                                         chat_message = ChatMessage(
                                             SessionID=session_id,
                                             Message=message,
                                             Response=response_text,
-                                            Intent=intent  # Preserve the original intent
+                                            Intent=intent
                                         )
                                         db.session.add(chat_message)
                                         db.session.commit()
@@ -312,10 +301,10 @@ def register_socket_handlers(socketio_instance):
                                         emit('response', {
                                             'message_id': chat_message.MessageID,
                                             'response': response_text,
-                                            'intent': intent,  # Keep the original intent
+                                            'intent': intent,
                                             'entities': all_entities,
                                             'missing_entities': missing_fields if missing_fields else [],
-                                            'conversation_active': True  # Force conversation to stay active
+                                            'conversation_active': True
                                         })
                                         logger.info(f"Session state after single entity processing: {session_state}")
                                         return
@@ -323,13 +312,10 @@ def register_socket_handlers(socketio_instance):
                                     response_text = inquiry_response.get('display_text', inquiry_response.get('message', 'Request processed'))
                                     missing_fields = inquiry_response.get('missing_fields', [])
                                     
-                                    # Check if this is a verification question
                                     if inquiry_response.get('is_verification_question'):
-                                        # Update verification state
                                         session_state['verification_step'] = inquiry_response.get('verification_step', 0)
                                         session_state['verification_category'] = inquiry_response.get('verification_category')
                                         
-                                        # Store and emit response
                                         chat_message = ChatMessage(
                                             SessionID=session_id,
                                             Message=message,
@@ -349,7 +335,6 @@ def register_socket_handlers(socketio_instance):
                                         })
                                         logger.info(f"Session state after verification setup: {session_state}")
                                         return
-                                    # Update with any still missing fields
                                     elif missing_fields:
                                         session_state['missing_entities'] = missing_fields
                                         response_data = {
@@ -359,14 +344,12 @@ def register_socket_handlers(socketio_instance):
                                             'missing_entities': missing_fields
                                         }
                                     else:
-                                        # Request completed successfully
                                         response_data = {
                                             'response': response_text,
                                             'intent': intent,
                                             'entities': all_entities
                                         }
-                                        
-                                    # Store message
+                                    
                                     chat_message = ChatMessage(
                                         SessionID=session_id,
                                         Message=message,
@@ -393,178 +376,114 @@ def register_socket_handlers(socketio_instance):
                                 emit('error', {'message': f'Failed to process inquiry: {str(e)}'})
                                 return
             
-                            # In the verification handling section, modify this part:
-                if session_state.get('verification_step', 0) > 0:
-                    try:
-                        # Process verification response
-                        intent = session_state['current_intent']
-                        all_entities = session_state['collected_entities']
-                        
-                        # Add the verification answer to entities
-                        if session_state.get('verification_category') and session_state.get('verification_step'):
-                            category = session_state['verification_category']
-                            step = session_state['verification_step'] - 1  # Convert to 0-indexed
-                            
-                            # Get the field name to store this answer
-                            field_name = inquiry_handler.verification_questions[category][step]['field']
-                            all_entities[field_name] = message
-                            
-                        # Update collected entities in session state
-                        session_state['collected_entities'] = all_entities
-                        
-                        # Process with inquiry handler
-                        inquiry_response = inquiry_handler.handle_verification(
-                            int(current_user.UserID),
-                            message,
-                            intent,
-                            all_entities,
-                            session_state['verification_category'],
-                            session_state['verification_step']
-                        )
-                        
-                        if inquiry_response:
-                            # Extract the display_text if it exists
-                            response_text = inquiry_response.get('display_text', inquiry_response.get('message', 'Request processed'))
-                            # Prevent switching to goodbye intent during verification
-                            if intent in ['account_activation', 'account_deactivation', 'loan_status', 'atm_location'] and not inquiry_response.get('verification_complete', False):
-                                # Force continuation of verification
-                                # Check if we have another verification question or need to continue verification
-                                if inquiry_response.get('is_verification_question') or inquiry_response.get('continue_verification', False):
-                                    # Update verification state - only update if provided in response
-                                    if 'verification_step' in inquiry_response:
-                                        session_state['verification_step'] = inquiry_response.get('verification_step', 0)
-                                    if 'verification_category' in inquiry_response:
-                                        session_state['verification_category'] = inquiry_response.get('verification_category')
-                                    
-                                    # Store and emit response
-                                    chat_message = ChatMessage(
-                                        SessionID=session_id,
-                                        Message=message,
-                                        Response=inquiry_response['message'],
-                                        Intent=intent
-                                    )
-                                    db.session.add(chat_message)
-                                    db.session.commit()
-                                    
-                                    emit('response', {
-                                        'message_id': chat_message.MessageID,
-                                        'response': inquiry_response['message'],
-                                        'intent': intent,
-                                        'entities': all_entities,
-                                        'is_verification': True,
-                                        'conversation_active': True
-                                    })
-                                    logger.info(f"Session state after verification processing: {session_state}")
-                                    return
-                                
-                                # Continue verification by default
-                                chat_message = ChatMessage(
-                                    SessionID=session_id,
-                                    Message=message,
-                                    Response=inquiry_response['message'],
-                                    Intent=intent
-                                )
-                                db.session.add(chat_message)
-                                db.session.commit()
-                                
-                                emit('response', {
-                                    'message_id': chat_message.MessageID,
-                                    'response': inquiry_response['message'],
-                                    'intent': intent,
-                                    'entities': all_entities,
-                                    'is_verification': True,
-                                    'conversation_active': True
-                                })
-                                logger.info(f"Session state after continued verification: {session_state}")
-                                return
-                            
-                            # Check if we have another verification question or need to continue verification
-                            if inquiry_response.get('is_verification_question') or inquiry_response.get('continue_verification', False):
-                                # Update verification state - only update if provided in response
-                                if 'verification_step' in inquiry_response:
-                                    session_state['verification_step'] = inquiry_response.get('verification_step', 0)
-                                if 'verification_category' in inquiry_response:
-                                    session_state['verification_category'] = inquiry_response.get('verification_category')
-                                
-                                # Store and emit response
-                                chat_message = ChatMessage(
-                                    SessionID=session_id,
-                                    Message=message,
-                                    Response=inquiry_response['message'],
-                                    Intent=intent
-                                )
-                                db.session.add(chat_message)
-                                db.session.commit()
-                                
-                                emit('response', {
-                                    'message_id': chat_message.MessageID,
-                                    'response': inquiry_response['message'],
-                                    'intent': intent,
-                                    'entities': all_entities,
-                                    'is_verification': True,
-                                    'conversation_active': True
-                                })
-                                logger.info(f"Session state after verification question: {session_state}")
-                                return
-                            # Only clear verification state if we've explicitly completed ALL verification questions
-                            elif inquiry_response.get('verification_complete', False):
-                                # Verification completed, clear verification state
-                                session_state['verification_step'] = 0
-                                session_state['verification_category'] = None
-                                
-                                # Store final response
-                                chat_message = ChatMessage(
-                                    SessionID=session_id,
-                                    Message=message,
-                                    Response=inquiry_response['message'],
-                                    Intent=intent
-                                )
-                                db.session.add(chat_message)
-                                db.session.commit()
-                                
-                                emit('response', {
-                                    'message_id': chat_message.MessageID,
-                                    'response': inquiry_response['message'],
-                                    'intent': intent,
-                                    'entities': all_entities,
-                                    'conversation_active': False
-                                })
-                                logger.info(f"Session state after verification completion: {session_state}")
-                                return
-                            else:
-                                # Continue verification by default unless explicitly told to stop
-                                # This prevents premature termination of the verification sequence
-                                chat_message = ChatMessage(
-                                    SessionID=session_id,
-                                    Message=message,
-                                    Response=inquiry_response['message'],
-                                    Intent=intent
-                                )
-                                db.session.add(chat_message)
-                                db.session.commit()
-                                
-                                emit('response', {
-                                    'message_id': chat_message.MessageID,
-                                    'response': inquiry_response['message'],
-                                    'intent': intent,
-                                    'entities': all_entities,
-                                    'is_verification': True,
-                                    'conversation_active': True
-                                })
-                                logger.info(f"Session state after default continuation: {session_state}")
-                                return
-                    except Exception as e:
-                        logger.error(f"Error processing verification: {str(e)}")
-                        import traceback
-                        logger.error(traceback.format_exc())
-                        emit('error', {'message': f'Failed to process verification: {str(e)}'})
+            # Updated Verification Handling: Check if verification is active based on verification_category
+            if session_state.get('verification_category'):
+                try:
+                    intent = session_state['current_intent']
+                    all_entities = session_state['collected_entities']
+                    
+                    category = session_state['verification_category']
+                    # Use zero-indexed verification_step (default to 0 if somehow None)
+                    current_step = session_state['verification_step'] if session_state['verification_step'] is not None else 0
+                    
+                    verification_questions = inquiry_handler.verification_questions.get(category, [])
+                    if current_step < len(verification_questions):
+                        field_name = verification_questions[current_step]['field']
+                        all_entities[field_name] = message
+                    else:
+                        emit('error', {'message': 'Verification step out of range'})
                         return
+                    
+                    session_state['collected_entities'] = all_entities
+                    
+                    inquiry_response = inquiry_handler.handle_verification(
+                        int(current_user.UserID),
+                        message,
+                        intent,
+                        all_entities,
+                        category,
+                        current_step
+                    )
+                    
+                    if inquiry_response:
+                        # Continue verification if indicated
+                        if inquiry_response.get('is_verification_question') or inquiry_response.get('continue_verification', False):
+                            session_state['verification_step'] = current_step + 1
+                            
+                            chat_message = ChatMessage(
+                                SessionID=session_id,
+                                Message=message,
+                                Response=inquiry_response['message'],
+                                Intent=intent
+                            )
+                            db.session.add(chat_message)
+                            db.session.commit()
+                            
+                            emit('response', {
+                                'message_id': chat_message.MessageID,
+                                'response': inquiry_response['message'],
+                                'intent': intent,
+                                'entities': all_entities,
+                                'is_verification': True,
+                                'conversation_active': True
+                            })
+                            logger.info(f"Session state after verification processing: {session_state}")
+                            return
+                        
+                        # If verification is complete, clear verification state
+                        elif inquiry_response.get('verification_complete', False):
+                            session_state['verification_step'] = None
+                            session_state['verification_category'] = None
+                            
+                            chat_message = ChatMessage(
+                                SessionID=session_id,
+                                Message=message,
+                                Response=inquiry_response['message'],
+                                Intent=intent
+                            )
+                            db.session.add(chat_message)
+                            db.session.commit()
+                            
+                            emit('response', {
+                                'message_id': chat_message.MessageID,
+                                'response': inquiry_response['message'],
+                                'intent': intent,
+                                'entities': all_entities,
+                                'conversation_active': False
+                            })
+                            logger.info(f"Session state after verification completion: {session_state}")
+                            return
+                        else:
+                            chat_message = ChatMessage(
+                                SessionID=session_id,
+                                Message=message,
+                                Response=inquiry_response['message'],
+                                Intent=intent
+                            )
+                            db.session.add(chat_message)
+                            db.session.commit()
+                            
+                            emit('response', {
+                                'message_id': chat_message.MessageID,
+                                'response': inquiry_response['message'],
+                                'intent': intent,
+                                'entities': all_entities,
+                                'is_verification': True,
+                                'conversation_active': True
+                            })
+                            logger.info(f"Session state after default continuation: {session_state}")
+                            return
+                except Exception as e:
+                    logger.error(f"Error processing verification: {str(e)}")
+                    import traceback
+                    logger.error(traceback.format_exc())
+                    emit('error', {'message': f'Failed to process verification: {str(e)}'})
+                    return
             
             # Check if we're awaiting confirmation for intent switching
             if session_state.get('awaiting_confirmation'):
                 if session_state['confirmation_type'] == 'intent_switch':
                     if message.lower() in ['yes', 'y', 'sure', 'ok', 'okay']:
-                        # User confirmed switch, update intent and entities
                         new_intent = session_state.pop('potential_new_intent')
                         new_entities = session_state.pop('potential_entities', {})
                         
@@ -574,7 +493,6 @@ def register_socket_handlers(socketio_instance):
                         session_state.pop('awaiting_confirmation')
                         session_state.pop('confirmation_type')
                         
-                        # Check for required entities for the new intent
                         if new_intent in ['account_activation', 'account_deactivation', 'loan_status', 'atm_location']:
                             try:
                                 required_entities = inquiry_handler._get_required_entities(new_intent)
@@ -585,7 +503,6 @@ def register_socket_handlers(socketio_instance):
                                     logger.info(f"Missing entities for {new_intent}: {missing_entities}")
                                     session_state['missing_entities'] = missing_entities
                                     
-                                    # Generate response asking for missing entities
                                     response_text = f"Please provide the following information: {', '.join(missing_entities)}"
                                     
                                     chat_message = ChatMessage(
@@ -610,7 +527,6 @@ def register_socket_handlers(socketio_instance):
                             except Exception as e:
                                 logger.error(f"Error getting required entities: {str(e)}")
                         
-                        # If all entities are collected, proceed with normal flow
                         response_text = f"Switched to processing your {new_intent} request."
                         
                         chat_message = ChatMessage(
@@ -632,10 +548,9 @@ def register_socket_handlers(socketio_instance):
                         logger.info(f"Session state after intent switch completion: {session_state}")
                         return
                     else:
-                        # User declined to switch, continue with original intent
                         original_intent = session_state['current_intent']
                         session_state.pop('potential_new_intent', None)
-                        session_state.pop('potential_entities', None) 
+                        session_state.pop('potential_entities', None)
                         session_state.pop('awaiting_confirmation')
                         session_state.pop('confirmation_type')
                         
@@ -673,7 +588,6 @@ def register_socket_handlers(socketio_instance):
                 
                 logger.info(f"Chatbot response data: {response_data}")
                 
-                # Make sure response contains required fields
                 if 'response' not in response_data:
                     response_data['response'] = "I couldn't process that properly. Can you try again?"
                 
@@ -682,29 +596,21 @@ def register_socket_handlers(socketio_instance):
                 
                 # Check if we're getting a 'goodbye' intent during an important process
                 if response_data['intent'] == 'goodbye' and session_state.get('current_intent') in ['account_activation', 'account_deactivation', 'loan_status', 'atm_location']:
-                    # Check if we're in the middle of an important process
-                    if session_state.get('verification_step', 0) > 0 or session_state.get('missing_entities') or session_state.get('collected_entities'):
-                        # Override the goodbye intent to continue the process
+                    if session_state.get('verification_step') or session_state.get('missing_entities') or session_state.get('collected_entities'):
                         response_data['intent'] = session_state['current_intent']
                         response_data['response'] = "Let's continue with your " + session_state['current_intent'].replace('_', ' ') + " process. " 
-                        
-                        # If we have missing entities, ask for them
                         if session_state.get('missing_entities'):
                             response_data['response'] += f"Please provide the following information: {', '.join(session_state['missing_entities'])}"
-                        # Otherwise, provide a generic continuation message
                         else:
                             response_data['response'] += "How can I assist you further with this request?"
                 
-                # Handle intent switching - if there's a current intent and missing entities,
-                # confirm with user if they want to switch
+                # Handle intent switching
                 if (session_state['current_intent'] and 
                     session_state['current_intent'] not in ['unknown', 'fallback', 'goodbye'] and
                     response_data['intent'] != session_state['current_intent'] and
                     response_data['intent'] not in ['unknown', 'fallback', 'goodbye']):
                     
-                    # If we were in the middle of collecting entities, ask for confirmation
                     if session_state.get('collected_entities'):
-                        # Store the potential new intent in session state
                         session_state['potential_new_intent'] = response_data['intent']
                         session_state['potential_entities'] = response_data.get('entities', {})
                         
@@ -714,7 +620,6 @@ def register_socket_handlers(socketio_instance):
                             f"(Yes/No)"
                         )
                         
-                        # Store confirmation message
                         chat_message = ChatMessage(
                             SessionID=session_id,
                             Message=message,
@@ -724,7 +629,6 @@ def register_socket_handlers(socketio_instance):
                         db.session.add(chat_message)
                         db.session.commit()
                         
-                        # Set a confirmation state flag
                         session_state['awaiting_confirmation'] = True
                         session_state['confirmation_type'] = 'intent_switch'
                         
@@ -738,14 +642,12 @@ def register_socket_handlers(socketio_instance):
                         })
                         logger.info(f"Session state after intent switch confirmation request: {session_state}")
                         return
-                    # Check if this is a new intent
                 new_intent = response_data.get('intent')
                 if new_intent and (not session_state['current_intent'] or new_intent != session_state['current_intent']) and new_intent not in ['unknown', 'fallback', 'goodbye']:
                     logger.info(f"New intent detected: {new_intent}")
                     session_state['current_intent'] = new_intent
                     session_state['collected_entities'] = response_data.get('entities', {})
                     
-                    # Check if we need to collect more entities for this intent
                     if new_intent in ['account_activation', 'account_deactivation', 'loan_status', 'atm_location']:
                         try:
                             required_entities = inquiry_handler._get_required_entities(new_intent)
@@ -763,7 +665,6 @@ def register_socket_handlers(socketio_instance):
                             logger.error(traceback.format_exc())
                             response_data['response'] = "I couldn't process that request. Please try again."
                 
-                # Store message
                 chat_message = ChatMessage(
                     SessionID=session_id,
                     Message=message,
@@ -814,7 +715,6 @@ def register_socket_handlers(socketio_instance):
                 emit('error', {'message': 'Invalid or inactive session'})
                 return
             
-            # Check if there's an ongoing operation
             session_state = active_sessions.get(str(session_id))
             if session_state and session_state.get('missing_entities'):
                 emit('warning', {
@@ -823,23 +723,19 @@ def register_socket_handlers(socketio_instance):
                 })
                 return
             
-            # Close session
             session.Status = 'Completed'
             session.EndTime = datetime.utcnow()
             db.session.commit()
             
-            # Clean up session state
             if str(session_id) in active_sessions:
                 del active_sessions[str(session_id)]
             
-            # Clean up any pending inquiries - safely
             try:
                 if hasattr(inquiry_handler, 'pending_inquiries') and int(current_user.UserID) in inquiry_handler.pending_inquiries:
                     del inquiry_handler.pending_inquiries[int(current_user.UserID)]
             except Exception as e:
                 logger.warning(f"Error clearing pending inquiries: {str(e)}")
             
-            # Safely clear user data
             try:
                 chatbot.clear_user_data(str(current_user.UserID))
             except Exception as e:
@@ -871,23 +767,19 @@ def register_socket_handlers(socketio_instance):
                 emit('error', {'message': 'Invalid or inactive session'})
                 return
             
-            # Force close session
             session.Status = 'Completed'
             session.EndTime = datetime.utcnow()
             db.session.commit()
             
-            # Clean up session state
             if str(session_id) in active_sessions:
                 del active_sessions[str(session_id)]
             
-            # Safely clean up any pending inquiries
             try:
                 if hasattr(inquiry_handler, 'pending_inquiries') and int(current_user.UserID) in inquiry_handler.pending_inquiries:
                     del inquiry_handler.pending_inquiries[int(current_user.UserID)]
             except Exception as e:
                 logger.warning(f"Error clearing pending inquiries in force end: {str(e)}")
             
-            # Safely clear chatbot data
             try:
                 chatbot.clear_user_data(str(current_user.UserID))
             except Exception as e:
@@ -914,7 +806,7 @@ def init_app(app, socketio_instance):
         # Register socket event handlers
         register_socket_handlers(socketio)
         
-        # Register blueprint
+        # Register blueprint if not already registered
         if not any(bp.name == 'chat_routes' for bp in app.blueprints.values()):
             app.register_blueprint(chat_bp)
         
