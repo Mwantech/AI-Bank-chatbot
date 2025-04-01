@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './auth/Login';
+import Signup from './auth/signup';
 import ChatInterface from './components/Chatinterface';
+import LandingPage from './components/LandingPage';
+import Dashboard from './components/Dashboard'; // Import the new Dashboard component
 
 const App = () => {
   const [user, setUser] = useState(null);
@@ -37,44 +40,67 @@ const App = () => {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen">
-        <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-        <p className="mt-4 text-gray-700">Loading...</p>
+      <div className="loading-container">
+        <div className="loading-spinner"></div>
+        <p>Loading...</p>
       </div>
     );
   }
 
   return (
     <Router>
-      <div className="min-h-screen bg-gray-50">
-        <div className="container mx-auto px-4 py-6">
-          <Routes>
-            <Route 
-              path="/login" 
-              element={
-                user ? (
-                  <Navigate to="/" replace />
-                ) : (
-                  <Login onLoginSuccess={handleLoginSuccess} />
-                )
-              } 
-            />
-            <Route 
-              path="/" 
-              element={
-                user ? (
-                  <ChatInterface 
-                    user={user} 
-                    setUser={setUser} 
-                  />
-                ) : (
-                  <Navigate to="/login" replace />
-                )
-              } 
-            />
-          </Routes>
-        </div>
-      </div>
+      <Routes>
+        <Route 
+          path="/login" 
+          element={
+            user ? (
+              <Navigate to="/dashboard" />
+            ) : (
+              <Login onLoginSuccess={handleLoginSuccess} />
+            )
+          } 
+        />
+        <Route 
+          path="/signup" 
+          element={
+            user ? (
+              <Navigate to="/dashboard" />
+            ) : (
+              <Signup />
+            )
+          } 
+        />
+        <Route 
+          path="/dashboard" 
+          element={
+            user ? (
+              <Dashboard user={user} />
+            ) : (
+              <Navigate to="/login" />
+            )
+          } 
+        />
+        <Route 
+          path="/chat" 
+          element={
+            user ? (
+              <ChatInterface user={user} />
+            ) : (
+              <Navigate to="/login" />
+            )
+          } 
+        />
+        <Route 
+          path="/" 
+          element={
+            user ? (
+              <Navigate to="/dashboard" />
+            ) : (
+              <LandingPage />
+            )
+          } 
+        />
+      </Routes>
     </Router>
   );
 };

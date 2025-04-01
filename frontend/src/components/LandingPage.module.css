@@ -1,0 +1,275 @@
+/* LandingPage.module.css */
+.landingPage {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 5%;
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.logo h2 {
+  color: #b80d0d;
+  font-weight: 700;
+  font-size: 1.8rem;
+  margin: 0;
+}
+
+.nav ul {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 2rem;
+}
+
+.nav a {
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.nav a:hover {
+  color: #b80d0d;
+}
+
+.loginBtn {
+  background-color: transparent;
+  border: 2px solid #b80d0d;
+  color: #b80d0d;
+  padding: 0.5rem 1.5rem;
+  border-radius: 4px;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.loginBtn:hover {
+  background-color: #b80d0d;
+  color: white;
+}
+
+.main {
+  flex: 1;
+}
+
+.heroSection {
+  display: flex;
+  padding: 3rem 5%;
+  min-height: 80vh;
+  align-items: center;
+  background: linear-gradient(to right, #f8f9fa, #e9ecef);
+}
+
+.heroContent {
+  flex: 1;
+  padding-right: 2rem;
+}
+
+.heroContent h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1.5rem;
+  color: #333;
+  line-height: 1.2;
+}
+
+.heroContent p {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: #555;
+  margin-bottom: 2rem;
+}
+
+.getStartedBtn {
+  display: inline-block;
+  background-color: #b80d0d;
+  color: white;
+  font-weight: 600;
+  font-size: 1.1rem;
+  padding: 0.8rem 2.5rem;
+  border-radius: 4px;
+  text-decoration: none;
+  transition: all 0.3s;
+  box-shadow: 0 4px 6px rgba(184, 13, 13, 0.2);
+}
+
+.getStartedBtn:hover {
+  background-color: #a00b0b;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px rgba(184, 13, 13, 0.3);
+}
+
+.heroImage {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.imagePlaceholder {
+  width: 90%;
+  max-width: 500px;
+  height: 400px;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.chatbotPreview {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.chatHeader {
+  background-color: #b80d0d;
+  color: white;
+  padding: 1rem;
+  font-weight: 600;
+}
+
+.chatMessages {
+  flex: 1;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  overflow-y: auto;
+}
+
+.botMessage, .userMessage {
+  max-width: 70%;
+  padding: 0.8rem 1rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+}
+
+.botMessage {
+  background-color: #f1f1f1;
+  align-self: flex-start;
+  border-top-left-radius: 2px;
+}
+
+.userMessage {
+  background-color: #e6f3ff;
+  align-self: flex-end;
+  border-top-right-radius: 2px;
+}
+
+.featuresSection {
+  padding: 4rem 5%;
+  text-align: center;
+  background-color: white;
+}
+
+.featuresSection h2 {
+  font-size: 2rem;
+  margin-bottom: 3rem;
+  color: #333;
+}
+
+.featureCards {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.featureCard {
+  flex: 1;
+  min-width: 250px;
+  max-width: 350px;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.featureCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 16px rgba(0, 0, 0, 0.12);
+}
+
+.featureIcon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.featureCard h3 {
+  font-size: 1.4rem;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.featureCard p {
+  color: #666;
+  line-height: 1.6;
+}
+
+.footer {
+  background-color: #f8f9fa;
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+  border-top: 1px solid #eaeaea;
+}
+
+/* Loading styles */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+.loading-spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-top: 4px solid #b80d0d;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .heroSection {
+    flex-direction: column;
+    text-align: center;
+    padding: 2rem 1rem;
+  }
+  
+  .heroContent {
+    padding-right: 0;
+    margin-bottom: 2rem;
+  }
+  
+  .nav ul {
+    gap: 1rem;
+  }
+  
+  .featureCards {
+    flex-direction: column;
+    align-items: center;
+  }
+}

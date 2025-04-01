@@ -5,6 +5,7 @@ from flask_socketio import SocketIO
 from dotenv import load_dotenv
 from models import db
 from auth import auth_bp
+from accounts_routes import account_bp
 from chat import chat_bp, init_app as init_chat
 import os
 
@@ -47,6 +48,7 @@ def create_app():
     # Register blueprints
     app.register_blueprint(auth_bp)
     app.register_blueprint(chat_bp)
+    app.register_blueprint(account_bp)
     
     # Initialize chat with the socketio instance
     init_chat(app, socketio)

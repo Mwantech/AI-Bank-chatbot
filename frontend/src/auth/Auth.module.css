@@ -1,0 +1,225 @@
+/* Auth.module.css */
+.authContainer {
+    display: flex;
+    min-height: 100vh;
+    background-color: #f7f7f7;
+  }
+  
+  .authCard {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    background-color: white;
+  }
+  
+  .signupCard {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    overflow-y: auto;
+  }
+  
+  .authHeader {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  
+  .authHeader h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 0.5rem;
+  }
+  
+  .authHeader p {
+    color: #666;
+    font-size: 1rem;
+  }
+  
+  .formGroup {
+    margin-bottom: 1.5rem;
+    width: 100%;
+  }
+  
+  .formRow {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 0;
+  }
+  
+  .formRow .formGroup {
+    flex: 1;
+  }
+  
+  .formGroup label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #444;
+    font-size: 0.9rem;
+  }
+  
+  .formGroup input {
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    transition: border-color 0.2s;
+  }
+  
+  .formGroup input:focus {
+    outline: none;
+    border-color: #b80d0d;
+    box-shadow: 0 0 0 2px rgba(184, 13, 13, 0.1);
+  }
+  
+  .formGroup input:disabled {
+    background-color: #f9f9f9;
+    cursor: not-allowed;
+  }
+  
+  .errorMessage {
+    padding: 0.75rem;
+    margin-bottom: 1.5rem;
+    background-color: #fee2e2;
+    color: #b91c1c;
+    border-radius: 4px;
+    font-size: 0.9rem;
+  }
+  
+  .submitButton {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #b80d0d;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 45px;
+  }
+  
+  .submitButton:hover {
+    background-color: #a00b0b;
+  }
+  
+  .submitButton:disabled {
+    background-color: #e5e5e5;
+    color: #666;
+    cursor: not-allowed;
+  }
+  
+  .authFooter {
+    margin-top: 1.5rem;
+    text-align: center;
+    font-size: 0.9rem;
+    color: #666;
+  }
+  
+  .link {
+    color: #b80d0d;
+    font-weight: 500;
+    text-decoration: none;
+  }
+  
+  .link:hover {
+    text-decoration: underline;
+  }
+  
+  .absaBranding {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #b80d0d;
+    color: white;
+    padding: 2rem;
+  }
+  
+  .logo {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+  }
+  
+  .absaBranding h3 {
+    font-size: 1.75rem;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+  }
+  
+  .absaBranding p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+  }
+  
+  /* Spinner for loading state */
+  .spinner {
+    display: inline-block;
+    position: relative;
+    width: 24px;
+    height: 24px;
+  }
+  
+  .spinner div {
+    box-sizing: border-box;
+    display: block;
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    margin: 2px;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    animation: spinner 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+    border-color: #fff transparent transparent transparent;
+  }
+  
+  .spinner div:nth-child(1) {
+    animation-delay: -0.45s;
+  }
+  
+  .spinner div:nth-child(2) {
+    animation-delay: -0.3s;
+  }
+  
+  .spinner div:nth-child(3) {
+    animation-delay: -0.15s;
+  }
+  
+  @keyframes spinner {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .authContainer {
+      flex-direction: column;
+    }
+    
+    .absaBranding {
+      padding: 1.5rem;
+    }
+    
+    .formRow {
+      flex-direction: column;
+      gap: 0;
+    }
+    
+    .authCard {
+      padding: 1.5rem;
+    }
+  }

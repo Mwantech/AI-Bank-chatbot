@@ -20,7 +20,11 @@
         "Hello! How can I assist you with your banking needs today?",
         "Hi there! I'm here to help with your banking questions.",
         "Welcome! What can I help you with today?",
-        "Hello! I'm your banking assistant. How may I help you?"
+        "Hello! I'm your banking assistant. How may I help you?",
+        "Good day! I'm ready to assist with any banking questions you might have.",
+        "Hello and welcome! How may I help with your banking today?",
+        "Hi there! Thank you for reaching out. How can I assist with your banking needs?",
+        "Welcome to our banking services! How can I help you today?"
       ]
     },
     {
@@ -41,7 +45,11 @@
         "Goodbye! Have a great day!",
         "Thank you for banking with us. Have a wonderful day!",
         "Thanks for chatting! Let us know if you need anything else.",
-        "Goodbye! Feel free to return if you have more questions."
+        "Goodbye! Feel free to return if you have more questions.",
+        "Thank you for choosing our bank. Have a fantastic day!",
+        "It was a pleasure assisting you today. Goodbye!",
+        "Thank you for your time. Is there anything else I can help with before you go?",
+        "We appreciate your business. Have a wonderful day ahead!"
       ]
     },
     {
@@ -67,7 +75,9 @@
       "responses": [
         "For security reasons, I cannot directly show your balance. Here's how to check your balance:\n1. Log into your online banking account\n2. Navigate to the 'Accounts' section\n3. Select your account to view the balance\n\nAlternatively, you can:\n- Use our mobile banking app\n- Visit the nearest branch\n- Call our customer service at 1-800-XXX-XXXX",
         "To protect your account security, I cannot display your balance directly. You can check your balance through:\n- Online banking\n- Mobile app\n- ATM\n- Branch visit\n- Phone banking",
-        "For account security, please check your balance through our secure channels:\n- Online banking portal\n- Mobile banking app\n- Visit a branch\n- Use an ATM\n- Contact customer service"
+        "For account security, please check your balance through our secure channels:\n- Online banking portal\n- Mobile banking app\n- Visit a branch\n- Use an ATM\n- Contact customer service",
+        "I'd be happy to help you check your balance, but for security reasons, I can't access that information directly. You can check your current balance by logging into online banking, using our mobile app, visiting any ATM, or calling our secure telephone banking service at 1-800-XXX-XXXX.",
+        "For your account security, balances can only be viewed through authenticated channels. You can check your balance instantly via our mobile app with Touch/Face ID, through online banking, or by calling our automated service at 1-800-XXX-XXXX with your account details ready."
       ]
     },
     {
@@ -94,7 +104,10 @@
       ],
       "responses": [
         "You can view your transaction history through these secure methods:\n1. Log into online banking\n2. Go to 'Transaction History'\n3. Select the desired time period\n\nAlternatively:\n- Use our mobile app\n- Request a statement at a branch\n- Call customer service",
-        "For security, please access your transaction history through:\n- Online banking portal\n- Mobile banking app\n- Branch visit\n- Monthly statement"
+        "For security, please access your transaction history through:\n- Online banking portal\n- Mobile banking app\n- Branch visit\n- Monthly statement",
+        "Your transaction history can be accessed securely through our digital banking channels. Log into our mobile app or online banking to view, filter, and search transactions by date, amount, or merchant. You can also download statements as PDF or CSV files for your records.",
+        "To review your transaction history, please use one of our secure channels: online banking (under 'Accounts' > 'Transaction History'), our mobile app (tap on any account to see transactions), or visit a branch with valid ID. You can filter transactions by date, category, or amount to find what you're looking for.",
+        "For your security, transaction history is available after authentication through our mobile app, online banking portal, or in-person at any branch. Our mobile app offers enhanced features like transaction categorization and spending analysis to help you track your finances."
       ]
     },
     {
@@ -121,7 +134,10 @@
       ],
       "responses": [
         "To make a secure transfer, please:\n1. Log into online banking\n2. Select 'Transfer Money'\n3. Choose accounts and enter amount\n4. Verify and confirm\n\nAlternatively:\n- Use our mobile app\n- Visit a branch\n- Call customer service",
-        "For your security, please make transfers through:\n- Online banking\n- Mobile app\n- Branch visit\n- Phone banking"
+        "For your security, please make transfers through:\n- Online banking\n- Mobile app\n- Branch visit\n- Phone banking",
+        "I can help you understand the transfer process. You can transfer funds through our online banking portal or mobile app by selecting 'Transfers,' choosing the source and destination accounts, entering the amount, and confirming the details. For first-time external transfers, there may be additional security verification steps.",
+        "To transfer money, please use our secure channels: online banking, mobile app, or visit any branch. For transfers to other people, you can use our P2P payment service by entering their email or mobile number. International transfers require additional information and may have different processing times and fees.",
+        "Making transfers is easy and secure through our digital banking platforms. Log in to online banking or our mobile app, select 'Transfer Funds', choose your accounts, enter the amount, and confirm. You can also schedule one-time future transfers or set up recurring transfers for regular payments."
       ]
     },
     {
@@ -147,7 +163,10 @@
       "responses": [
         "I can help you set up bill payment. Here are your options:",
         "Let me assist you with your bill payment needs.",
-        "Here's how to manage your bill payments:"
+        "Here's how to manage your bill payments:",
+        "Our bill pay service allows you to pay virtually any business or person. To set up bill payments, log into online banking or our mobile app, select 'Bill Pay', add your payee's information, and schedule your payment. You can set up one-time or recurring payments to stay on top of your bills.",
+        "To pay bills through our banking services, log in to online banking, navigate to 'Bill Pay', and add your payee details. Most electronic payments are delivered within 1-2 business days, while check payments may take 5-7 days. You can schedule future payments or set up recurring payments for regular bills.",
+        "Bill payments can be easily managed through our digital banking platforms. You can add payees, schedule one-time or recurring payments, and track payment history. For your security, first-time payees may require additional verification steps before payments can be processed."
       ]
     },
     {
@@ -173,7 +192,10 @@
       "responses": [
         "I understand you're having an issue. Let me help you resolve this.",
         "I'm sorry you're experiencing problems. Let's fix this together.",
-        "Thank you for reporting this issue. Here's what we can do:"
+        "Thank you for reporting this issue. Here's what we can do:",
+        "I apologize for the inconvenience. For your account security, please call our dedicated support line at 1-800-XXX-XXXX to report the issue and get immediate assistance. Our representatives are available 24/7 to help resolve account access problems.",
+        "I'm sorry to hear you're experiencing difficulties. For urgent issues like account access problems or card issues, please contact our customer service at 1-800-XXX-XXXX. For less time-sensitive matters, you can send a secure message through online banking once you regain access.",
+        "Thanks for letting us know about this issue. For quickest resolution, please contact our support team at 1-800-XXX-XXXX. For security reasons, they'll need to verify your identity before investigating the matter. You may also visit any branch with a valid ID for in-person assistance."
       ]
     },
     {
@@ -204,7 +226,10 @@
       "responses": [
         "I found {count} ATMs near {location}",
         "Here are the closest ATMs to you:",
-        "Let me show you the nearest ATM locations"
+        "Let me show you the nearest ATM locations",
+        "To find the nearest ATM, you can use our ATM locator tool on our website or mobile app. Enter your location or enable location services to see all nearby ATMs, including features like deposit capability, drive-up access, and 24-hour availability.",
+        "You can locate our ATMs through our mobile app's 'Locations' feature or on our website under 'ATM & Branch Locator.' Filter results based on services needed like cash deposits, check deposits, or drive-through access. We also participate in the Allpoint ATM network, giving you surcharge-free access to over 55,000 ATMs nationwide.",
+        "Our ATM locator is available on our website and mobile app. You can search by address, zip code, or current location to find nearby ATMs. Each listing shows available services (deposits, withdrawals, etc.), accessibility features, and hours of operation."
       ]
     },
     {
@@ -235,7 +260,10 @@
       "responses": [
         "I'll help you activate your {account_type} account. Please confirm your card number ending in {card_last_4}",
         "Let's get your {account_type} account activated. I'll need to verify your card ending in {card_last_4}",
-        "I can help activate your {account_type} account with card number ending {card_last_4}"
+        "I can help activate your {account_type} account with card number ending {card_last_4}",
+        "To activate your new card, you can call the number on the sticker attached to the card, use our mobile app under 'Card Management', or log into online banking and select 'Activate Card' from the account services menu. You'll need your card number and verification information ready.",
+        "For activating your new account, please follow these steps: 1) Visit our website or mobile app, 2) Click on 'First-time user? Register here', 3) Enter your account number and personal details to verify your identity, 4) Create your username and secure password, 5) Set up security questions and preferences.",
+        "Card activation is simple and can be done through multiple channels: call the activation number on the card, use our mobile app's 'Card Services' section, or log into online banking. The process takes just a few minutes, and your card will be ready to use immediately after activation."
       ]
     },
     {
@@ -266,7 +294,10 @@
       "responses": [
         "I'll help you deactivate your {account_type} account. Reason for closure: {reason_code}",
         "Let me assist you with closing your {account_type} account. Noted reason: {reason_code}",
-        "I'll process the closure of your {account_type} account. Reason provided: {reason_code}"
+        "I'll process the closure of your {account_type} account. Reason provided: {reason_code}",
+        "To close your account, you'll need to visit a branch location with valid ID, ensure your account has a zero balance, and sign a closure form. Alternatively, you can submit a written request by mail or through secure message banking if you're an existing online banking customer.",
+        "For account closure, please ensure all pending transactions have cleared and any automatic payments or deposits are redirected. You can initiate the process by visiting any branch, calling our customer service line, or sending a secure message through online banking. Joint accounts require authorization from all account holders.",
+        "If you need to temporarily freeze your card due to suspicious activity or misplacement, you can immediately do so through our mobile app under 'Card Controls' or by calling our 24/7 customer service. For permanent account closure, please visit a branch or call our dedicated account services team."
       ]
     },
     {
@@ -297,7 +328,10 @@
       "responses": [
         "Your {loan_type} loan application {application_id} is {status}",
         "The current status of your loan application is {status}",
-        "Here's what I found about your loan application:"
+        "Here's what I found about your loan application:",
+        "You can check the status of your loan application by logging into online banking and visiting the 'Applications' section or by calling our loan department at 1-800-XXX-XXXX with your application ID. For security reasons, I cannot access specific application details through this channel.",
+        "Loan application status can be viewed through your online banking profile under 'My Applications' or by contacting a loan officer directly. Please have your application ID ready when calling, as they'll need to verify your identity before sharing status details.",
+        "For the most current status of your loan application, please check online banking or contact our loan processing department. The typical timeline for loan decisions varies by loan type: personal loans (2-5 business days), auto loans (1-3 business days), and mortgages (up to 30 days)."
       ]
     },
     {
@@ -332,20 +366,459 @@
       "responses": [
         "Here's what you need to know about {topic}:",
         "Let me explain how {service_type} works",
-        "I can help you understand {banking_term}"
+        "I can help you understand {banking_term}",
+        "Our standard branch hours are Monday-Friday 9:00 AM to 5:00 PM, and Saturday 9:00 AM to 12:00 PM. Some locations may have extended hours or drive-through services with different schedules. You can check specific branch hours on our website or mobile app.",
+        "To deposit a check, you have several options: use our mobile app's check deposit feature by taking photos of the front and back, visit any ATM that accepts deposits, use a branch with a teller or deposit slip, or mail a deposit to our processing center (not recommended for urgent deposits).",
+        "For current interest rates on our deposit accounts and loans, please visit our website's 'Rates' section or speak with a financial advisor. Rates vary based on account type, balance tiers, term length for CDs, and current market conditions."
+      ]
+    },
+    {
+      "intent": "banking_hours",
+      "patterns": [
+        "When are you open?",
+        "What are the bank hours?",
+        "When does the branch close today?",
+        "Are you open on Saturday?",
+        "What time do you open tomorrow?",
+        "Holiday hours",
+        "Weekend banking hours",
+        "Are you closed on {holiday}?",
+        "When is the {location} branch open?",
+        "Drive-thru hours",
+        "ATM lobby access hours",
+        "Are you open right now?",
+        "What time does the bank close on Friday?",
+        "Late night banking options",
+        "24-hour banking locations",
+        "Special hours for seniors",
+        "Branch hours near me",
+        "Is the bank open on Sunday?",
+        "Early morning banking hours",
+        "What are your business days?"
+      ],
+      "required_entities": ["location", "day_of_week"],
+      "responses": [
+        "Our standard branch hours are:\n- Monday to Thursday: 9:00 AM - 5:00 PM\n- Friday: 9:00 AM - 6:00 PM\n- Saturday: 9:00 AM - 1:00 PM\n- Sunday: Closed\n\nHours may vary by location. You can check specific branch hours on our website or mobile app.",
+        "The {location} branch is open from {opening_time} to {closing_time} on {day_of_week}. Drive-through services typically open 30 minutes earlier and close 30 minutes later than lobby hours. ATM access is available 24/7.",
+        "Most of our branches operate Monday through Friday from 9:00 AM to 5:00 PM, with select locations offering Saturday hours from 9:00 AM to 1:00 PM. All branches are closed on Sundays and federal holidays. For your convenience, our online and mobile banking services are available 24/7.",
+        "Our typical banking hours are 9:00 AM to 5:00 PM weekdays, with extended hours until 6:00 PM on Friday. Select branches offer Saturday services from 9:00 AM to 1:00 PM. During federal holidays, all branches are closed, but ATMs, online banking, and mobile banking remain available 24/7.",
+        "For the {location} branch, current hours are {opening_time} to {closing_time} on {day_of_week}. Please note that some branches may have modified hours due to staffing or local regulations. You can always check the most current hours for any location through our website or mobile app's branch locator feature."
+      ]
+    },
+    {
+      "intent": "open_account",
+      "patterns": [
+        "How do I open an account?",
+        "I want to open a new {account_type} account",
+        "What do I need to open an account?",
+        "Can I open an account online?",
+        "Process for opening a joint account",
+        "Documents needed for new account",
+        "Minimum deposit to open account",
+        "Open a business account",
+        "How long does it take to open an account?",
+        "Can I open an account without visiting a branch?",
+        "Open a student checking account",
+        "Requirements for new account",
+        "I need to open a second account",
+        "Open account for minor",
+        "Can I open an account if I'm not a citizen?",
+        "Steps to open a savings account",
+        "Open an account with poor credit",
+        "Mobile account opening process",
+        "Digital account opening",
+        "ID requirements for new accounts"
+      ],
+      "required_entities": ["account_type", "applicant_type"],
+      "responses": [
+        "To open a {account_type} account, you can:\n1. Apply online through our website\n2. Use our mobile app\n3. Visit any branch in person\n4. Call our account services team\n\nYou'll need:\n- Government-issued photo ID\n- Social Security Number or Tax ID\n- Proof of address\n- Initial deposit (minimum varies by account type)",
+        "Opening a {account_type} account is easy! For {applicant_type} applicants, you'll need valid ID, proof of address, and an initial deposit. The process takes about 10-15 minutes online or mobile, and the account is typically ready for use within 1-2 business days after verification.",
+        "For a new {account_type} account, you can apply online, through our mobile app, or in person at any branch. You'll need to provide government-issued ID, your Social Security Number, contact information, and funding information. The minimum opening deposit for this account type is ${minimum_deposit}.",
+        "To open a {account_type} account as a {applicant_type}, bring your government-issued photo ID, Social Security Number/ITIN, proof of address, and initial deposit to any branch. Alternatively, complete the application online or through our mobile app for added convenience. Joint accounts require documentation from all account holders.",
+        "We've made opening a {account_type} account simple! You can complete the entire process online in about 10 minutes. You'll need your ID information, Social Security Number, contact details, and a funding method (debit card, existing bank account for transfer, or mobile check deposit). Most accounts are approved instantly, and you can access online banking immediately."
+      ]
+    },
+    {
+      "intent": "interest_rates",
+      "patterns": [
+        "What are your current interest rates?",
+        "Interest rate for {account_type} accounts",
+        "What's the APY on savings?",
+        "CD interest rates",
+        "Current mortgage rates",
+        "Best interest rate accounts",
+        "Rate comparison between accounts",
+        "How often does interest compound?",
+        "Interest rate on personal loans",
+        "Credit card interest rates",
+        "How to get better interest rate",
+        "Interest rate for high-yield savings",
+        "When do interest rates change?",
+        "How is interest calculated?",
+        "Promotional interest rates",
+        "Business account interest rates",
+        "Student account interest rates",
+        "Interest rate lock options",
+        "Money market account rates",
+        "How do I earn more interest?"
+      ],
+      "required_entities": ["account_type", "term_length"],
+      "responses": [
+        "Current interest rates for {account_type} accounts with a {term_length} term are {rate}% APY. These rates are subject to change based on market conditions. For the most up-to-date rates, please visit our website or speak with a financial advisor.",
+        "Our {account_type} accounts currently offer {rate}% APY for {term_length} terms. Interest is compounded daily and credited monthly. Rates may vary based on balance tiers and relationship status. Special promotional rates may be available for new accounts.",
+        "The current interest rate for {account_type} accounts is {rate}% APY with a {term_length} term. To get our best rates, consider our relationship banking programs or longer-term commitments. Interest rates are subject to change without notice, so I recommend checking our website for the most current information.",
+        "For {account_type} accounts with a {term_length} term, we're currently offering {rate}% APY. This rate is effective as of {effective_date} and is subject to change. Interest compounds daily and is credited monthly. Higher balances may qualify for better rates.",
+        "Our {account_type} accounts are currently earning {rate}% APY for a {term_length} term. To maximize your interest earnings, consider our tiered rate structure where higher balances earn better rates, or explore our CD options for guaranteed fixed rates. Interest rates are updated weekly on our website."
+      ]
+    },
+    {
+      "intent": "fees_information",
+      "patterns": [
+        "What fees do you charge?",
+        "Monthly maintenance fee",
+        "Is there an overdraft fee?",
+        "ATM withdrawal fees",
+        "Wire transfer fee schedule",
+        "How much for cashier's check?",
+        "Stop payment fee",
+        "Account minimum to avoid fees",
+        "Foreign transaction fees",
+        "Returned check fees",
+        "Early withdrawal penalty",
+        "Fee for paper statements",
+        "Late payment fees",
+        "How to waive monthly fees",
+        "Business account fees",
+        "Check order fees",
+        "Account research fees",
+        "Dormant account fees",
+        "Excessive withdrawal fees",
+        "Safe deposit box fees"
+      ],
+      "required_entities": ["account_type", "fee_type"],
+      "responses": [
+        "For {account_type} accounts, the {fee_type} fee is ${fee_amount}. There are several ways to avoid this fee, including maintaining a minimum balance of ${minimum_balance}, setting up direct deposit, or meeting other relationship criteria.",
+        "The {fee_type} fee for {account_type} accounts is ${fee_amount}. This fee can be waived by maintaining a daily balance of ${minimum_balance}, having monthly direct deposits totaling ${direct_deposit_amount}, or meeting other qualifying activities.",
+        "Our {account_type} accounts have a ${fee_amount} {fee_type} fee, which can be waived through several methods: maintaining ${minimum_balance} minimum daily balance, having qualifying direct deposits, making a minimum number of transactions, or meeting relationship banking criteria.",
+        "The current {fee_type} fee for {account_type} accounts is ${fee_amount}. We offer multiple ways to avoid this fee, including minimum balance requirements, direct deposit, combined relationship balances, or account activity thresholds. Students, seniors, and military members may qualify for fee waivers.",
+        "For your {account_type} account, there is a ${fee_amount} {fee_type} fee. You can avoid this fee by maintaining a minimum balance, having qualifying direct deposits, meeting transaction requirements, or through relationship banking benefits. See our fee schedule for complete details on all account-related fees."
+      ]
+    },
+    {
+      "intent": "security_features",
+      "patterns": [
+        "How secure is my account?",
+        "Is online banking safe?",
+        "How to enable two-factor authentication",
+        "Security features for mobile banking",
+        "Protect my account from fraud",
+        "Change my security settings",
+        "What if someone steals my identity?",
+        "Is my money safe with your bank?",
+        "How do you protect my data?",
+        "Set up alerts for suspicious activity",
+        "How to create a strong password",
+        "Are my transactions encrypted?",
+        "Report suspicious emails",
+        "Phishing protection",
+        "Fraud monitoring services",
+        "Security guarantees",
+        "Biometric authentication options",
+        "What to do if my card is compromised",
+        "How often should I change my password?",
+        "Security best practices"
+      ],
+      "required_entities": ["security_level"],
+      "responses": [
+        "Your account security is our top priority. We offer multiple layers of protection including encryption, multi-factor authentication, biometric login, and 24/7 fraud monitoring. For your {security_level} security needs, we recommend enabling all available security features in your profile settings.",
+        "We take your account security seriously with industry-standard encryption, multi-factor authentication, and continuous transaction monitoring. For {security_level} security, we recommend setting up account alerts, using our mobile app with biometric authentication, and regularly reviewing your transactions.",
+        "Our {security_level} security features include 256-bit encryption, multi-factor authentication, automatic timeout, biometric login options, and 24/7 fraud monitoring. We also provide zero liability protection for unauthorized transactions reported promptly. You can manage security settings in the 'Security Center' of your online banking.",
+        "Your financial security is our highest priority. Our {security_level} security includes encryption for all data, multi-factor authentication, automatic session timeouts, and continuous monitoring for suspicious activities. We recommend setting up account alerts and regularly reviewing your statements for any unauthorized transactions.",
+        "For {security_level} account protection, we offer advanced encryption, multi-factor authentication, biometric verification, and real-time fraud monitoring. You can enhance your security by enabling transaction alerts, using a unique password, keeping contact information updated, and regularly reviewing account activity."
+      ]
+    },
+    {
+      "intent": "card_services",
+      "patterns": [
+        "I need a new card",
+        "Replace my damaged card",
+        "Upgrade my card",
+        "Apply for a credit card",
+        "Change my card PIN",
+        "Add a card to digital wallet",
+        "Increase my credit limit",
+        "Set travel notification for my card",
+        "Report lost card",
+        "Can I get a second card?",
+        "What credit cards do you offer?",
+        "Order an additional card",
+        "Card delivery timeframe",
+        "Activate contactless payments",
+        "How do I use the chip in my card?",
+        "Track my new card",
+        "Change card design",
+        "Add authorized user to my card",
+        "Disable international purchases",
+        "Convert my card type"
+      ],
+      "required_entities": ["card_type"],
+      "responses": [
+        "For your {card_type} card request, you have several options: order a replacement through online banking under 'Card Services', request through our mobile app, or call customer service at 1-800-XXX-XXXX. Standard delivery takes 7-10 business days, or you can request expedited shipping for an additional fee.",
+        "I can help with your {card_type} card needs. To request a new or replacement card, log into online banking, go to 'Card Management', and select the appropriate option. You can also visit any branch with ID or call our customer service line. New cards typically arrive within 5-7 business days.",
+        "For {card_type} card services, you can use our mobile app or online banking to manage your card features, report a lost/stolen card, order replacements, add travel notifications, or adjust spending limits. For immediate assistance with a lost card, please call our 24/7 support line at 1-800-XXX-XXXX.",
+        "We can help with your {card_type} card request. You can order a replacement, report a lost/stolen card, or manage card settings through online banking or our mobile app under 'Card Services'. If you need immediate assistance, please call our 24/7 card services department at 1-800-XXX-XXXX.",
+        "For your {card_type} card request, you can place an order through online banking, our mobile app, by phone, or at any branch. Standard delivery is 7-10 business days at no charge. For urgent requests, we offer expedited delivery for an additional fee. Your card will arrive inactive and require activation through our secure channels."
+      ]
+    },
+    {
+      "intent": "mobile_banking",
+      "patterns": [
+        "How do I use mobile banking?",
+        "Download banking app",
+        "Mobile check deposit help",
+        "Banking app not working",
+        "Update mobile app",
+        "Mobile banking features",
+        "How to login to app",
+        "Reset mobile banking password",
+        "Is mobile banking secure?",
+        "Make payments through app",
+        "Mobile banking vs online banking",
+        "App store link for banking app",
+        "Mobile banking on multiple devices",
+        "App notification settings",
+        "Mobile banking limitations",
+        "App fingerprint login",
+        "Banking app tutorial",
+        "Deposit limits for mobile check deposit",
+        "View statements on mobile app",
+        "Mobile banking compatibility"
+      ],
+      "responses": [
+        "Our mobile banking app provides secure access to your accounts anytime, anywhere. You can check balances, transfer funds, deposit checks, pay bills, locate ATMs/branches, and more. Download our app from the Apple App Store or Google Play Store and follow the registration instructions.",
+        "To get started with mobile banking, download our app from your device's app store, then register using your online banking credentials or set up as a new user with your account information. The app offers secure access to account information, transfers, bill payments, mobile check deposits, and many other features.",
+        "Our mobile banking app offers convenient and secure banking on the go. Key features include account overview, transfers, bill payments, mobile check deposit, card management, spending insights, and branch/ATM locator. For security, we offer biometric login, encryption, and multi-factor authentication.",
+        "Mobile banking gives you secure access to your accounts 24/7. To get started, download our app from the Apple App Store or Google Play Store. You can view balances, transfer money, deposit checks using your phone's camera, pay bills, manage cards, set up alerts, and locate branches/ATMs.",
+        "Our mobile banking app provides a complete banking experience from your smartphone or tablet. Features include account management, transfers, bill pay, mobile check deposit, card controls, spending analysis, and location services. The app uses advanced security including encryption and biometric authentication for your protection."
+      ]
+    },
+    {
+      "intent": "direct_deposit",
+      "patterns": [
+        "How do I set up direct deposit?",
+        "Direct deposit form",
+        "Set up payroll deposit",
+        "Where's my routing number?",
+        "Account number for direct deposit",
+        "When will my direct deposit arrive?",
+        "Change direct deposit account",
+        "Government benefit direct deposit",
+        "Tax refund direct deposit",
+        "Social security direct deposit",
+        "How long does direct deposit take?",
+        "Verify direct deposit setup",
+        "Early direct deposit features",
+        "Multiple direct deposits",
+        "Direct deposit authorization form",
+        "Direct deposit for contractors",
+        "Split direct deposit between accounts",
+        "Direct deposit notification settings",
+        "Missing direct deposit",
+        "International direct deposit"
+      ],
+      "responses": [
+        "To set up direct deposit, provide your employer with our routing number (XXXXXXXXX) and your account number. You can find this information on your checks, through online banking, or on our mobile app. Most employers will have a direct deposit form that you'll need to complete.",
+        "Setting up direct deposit is simple: provide your employer with your account number and our routing number (XXXXXXXXX). You can find this information in online banking under 'Account Details', on your checks, or on your statements. Direct deposits typically arrive on the scheduled payday, sometimes even earlier.",
+        "For direct deposit setup, you'll need to provide your employer with: 1) Our bank's routing number: XXXXXXXXX, 2) Your complete account number (found in online banking or on checks), and 3) Account type (checking/savings). Complete your employer's direct deposit form with this information to get started.",
+        "To set up direct deposit, provide the payer (employer, government agency, etc.) with our routing number (XXXXXXXXX) and your account number. You can find both in online banking under 'Account Information', on your checks, or by contacting customer service. Most organizations have their own direct deposit forms to complete.",
+        "Setting up direct deposit requires providing your employer with your account information. Our routing number is XXXXXXXXX, and your specific account number can be found in online banking, on your checks, or by calling customer service. Many employers offer direct deposit forms, or you can request one from us."
+      ]
+    },
+    {
+      "intent": "statements_documents",
+      "patterns": [
+        "How do I get my statements?",
+        "Where are my tax documents?",
+        "Download account statement",
+        "Switch to paperless statements",
+        "Request paper statements",
+        "Missing statement",
+        "Year-end tax documents",
+        "Interest statements",
+        "Statement cycle dates",
+        "How long are statements available?",
+        "Get copy of old statement",
+        "Print statements from online banking",
+        "Export transactions to Excel",
+        "Statement delivery preferences",
+        "Access archived statements",
+        "Request duplicate statement",
+        "Monthly vs quarterly statements",
+        "Combined statements for multiple accounts",
+        "Statement fees",
+        "Mortgage statements"
+      ],
+      "required_entities": ["document_type"],
+      "responses": [
+        "Your {document_type} can be accessed through online banking under 'Statements & Documents'. We keep statements available online for 7 years. To switch to paperless delivery or request paper copies, update your preferences in the 'Profile & Settings' section.",
+        "To access your {document_type}, log into online banking and navigate to 'Statements & Documents'. From there, you can view, download, and print your documents. We maintain online statements for 7 years, and tax documents for 7 years. You can also request copies at any branch or through customer service.",
+        "Your {document_type} is available in online banking under 'Documents & Statements'. You can view, download, or print them in PDF format. We keep statements accessible online for 7 years. To change your delivery preferences between electronic and paper, visit 'Settings' in your online profile.",
+        "For your {document_type}, log into online banking and go to 'Statements & Documents'. You can view, download, print, or save documents in various formats (PDF, CSV). Electronic statements are typically available 1-2 business days after the statement cycle date and remain accessible for 7 years.",
+        "You can access your {document_type} through online banking in the 'Statements & Documents' section or via our mobile app. Documents are available in PDF format and can be saved or printed. We retain online statements for 7 years. If you need older documents, please contact customer service or visit a branch."
+      ]
+    },
+    {
+      "intent": "credit_score",
+      "patterns": [
+        "Can I check my credit score?",
+        "Free credit score access",
+        "How to improve credit score",
+        "Does checking my score affect it?",
+        "What's a good credit score?",
+        "Why did my credit score change?",
+        "Credit monitoring services",
+        "Credit report vs credit score",
+        "How often is credit score updated?",
+        "Factors affecting credit score",
+        "Credit score for loan approval",
+        "Check credit score without hurting it",
+        "Credit score needed for mortgage",
+        "FICO vs other credit scores",
+        "How banking affects credit score",
+        "Dispute credit report errors",
+        "Credit score after late payment",
+        "Building credit history",
+        "Credit score for credit card approval",
+        "Fix bad credit score"
+      ],
+      "required_entities": ["credit_score_range"],
+      "responses": [
+        "We offer free credit score access to our customers through online banking. A {credit_score_range} credit score generally ranges from {min_score} to {max_score}. Checking your own score does not impact it. To improve your score, focus on payment history, credit utilization, account age, and credit mix.",
+        "You can check your credit score for free through our online banking platform or mobile app. A {credit_score_range} score typically falls between {min_score} and {max_score}. This is a 'soft pull' that won't affect your score. We update scores monthly and provide tips to maintain or improve your credit standing.",
+        "We provide complimentary credit score access to our customers. A {credit_score_range} credit score is generally between {min_score} and {max_score}. Monitoring your score through our service is a 'soft inquiry' that doesn't impact your credit. We also offer personalized tips to help improve or maintain your score.",
+        "As our customer, you can access your credit score for free through online banking or our mobile app. A {credit_score_range} score typically ranges from {min_score} to {max_score}. Checking your own score doesn't harm it. We update scores monthly and provide educational resources to help understand and improve your credit profile.",
+        "We offer free credit score monitoring to our customers. A {credit_score_range} credit score generally falls between {min_score} and {max_score}. Viewing your score through our service won't impact it. To improve your score, focus on consistent on-time payments, keeping credit utilization low, and maintaining a good mix of credit types."
+      ]
+    },
+    {
+      "intent": "foreign_currency",
+      "patterns": [
+        "Exchange currency",
+        "Buy foreign currency",
+        "Current exchange rates",
+        "Travel money services",
+        "Convert dollars to euros",
+        "Foreign currency for trip",
+        "Order foreign cash",
+        "Currency exchange fees",
+        "Best way to get foreign currency",
+        "Exchange money for international travel",
+        "Foreign currency delivery",
+        "Cash passport card",
+        "Buy back unused foreign currency",
+        "Multi-currency account",
+        "Foreign exchange services",
+        "Exchange rate fluctuations",
+        "Foreign currency at branches",
+        "How long to get foreign currency",
+        "Exchange large amount of foreign money",
+        "Currency converter tools"
+      ],
+      "required_entities": ["currency_type"],
+      "responses": [
+        "We offer foreign currency exchange services for {currency_type} and many other currencies. You can order foreign currency through online banking, by phone, or at select branches. We recommend ordering 3-5 business days before your travel date. Exchange rates are updated daily and fees may apply.",
+        "For {currency_type} exchange, we offer competitive rates with several convenient options. Order through online banking, our mobile app, by phone, or at select branches. Currency is typically available within 1-3 business days. We also offer currency buy-back services for unused foreign cash upon your return.",
+        "We provide {currency_type} exchange services at competitive rates. You can check current exchange rates and place orders through online banking, by phone, or at select branches. For international travel, we recommend ordering currency 5-7 days in advance. Transaction fees may apply depending on account type and relationship status.",
+        "To exchange currency for {currency_type}, you can place an order through online banking, mobile app, by phone, or at select branches. We offer competitive exchange rates that are updated daily. Please order 3-5 business days before you need the currency. Delivery or pickup options are available.",
+        "Our {currency_type} exchange service offers competitive rates with convenient ordering options. Place your order online, through our mobile app, by phone, or at select branches. For large amounts, we recommend ordering 5-7 business days in advance. We also provide travel money cards as an alternative to carrying cash."
+      ]
+    },
+    {
+      "intent": "dispute_transaction",
+      "patterns": [
+        "I don't recognize a transaction",
+        "Dispute a charge",
+        "Wrong amount charged",
+        "Double charged for purchase",
+        "How to file a dispute",
+        "Fraudulent transaction",
+        "Merchant won't refund",
+        "Dispute timeline",
+        "Status of my dispute",
+        "Chargeback process",
+        "Unauthorized transaction",
+        "Service not provided but charged",
+        "Product not received",
+        "Disputing recurring charges",
+        "Canceled service still charging",
+        "Evidence for transaction dispute",
+        "Dispute resolution process",
+        "Credit card dispute vs debit card",
+        "Dispute fee",
+        "Dispute rights"
+      ],
+      "required_entities": ["incident_type"],
+      "responses": [
+        "For a {incident_type} dispute, you should contact us immediately. You can initiate a dispute through online banking under 'Transaction Dispute', via our mobile app, by calling our fraud department at 1-800-XXX-XXXX, or visiting any branch. Please have transaction details ready when filing.",
+        "I'm sorry to hear about the {incident_type} issue. To dispute a transaction, please log into online banking, locate the transaction, and select 'Dispute This Transaction'. Alternatively, contact our dispute resolution team at 1-800-XXX-XXXX. The investigation typically takes 45-90 days to complete.",
+        "For your {incident_type} case, you should file a dispute immediately. You can do this through online banking, our mobile app, by phone, or at any branch. We'll need the transaction date, amount, and merchant information. The resolution process typically takes 30-90 days depending on the complexity.",
+        "To dispute a transaction related to {incident_type}, please contact us right away. You can initiate the process through online banking, our mobile app, by calling our 24/7 fraud department at 1-800-XXX-XXXX, or visiting a branch. We'll guide you through the process and investigate the matter thoroughly.",
+        "For a {incident_type} dispute, please report it immediately. You can start the dispute process through online banking, our mobile app, by phone, or at any branch. Please be prepared to provide transaction details and any supporting documentation. Federal regulations provide certain protections, and we'll work to resolve this matter quickly."
+      ]
+    },
+    {
+      "intent": "appointment_scheduling",
+      "patterns": [
+        "Schedule an appointment",
+        "Meet with a banker",
+        "Book financial advisor meeting",
+        "Make branch appointment",
+        "Schedule loan consultation",
+        "Mortgage appointment",
+        "Investment planning meeting",
+        "Cancel my appointment",
+        "Reschedule bank appointment",
+        "Available appointment times",
+        "In-person vs virtual appointment",
+        "Schedule business banking meeting",
+        "Meet to discuss account options",
+        "Book time with specialist",
+        "Appointment confirmation",
+        "How long do appointments take?",
+        "What to bring to appointment",
+        "Same-day appointments available?",
+        "Schedule account review",
+        "Meet about retirement planning"
+      ],
+      "required_entities": ["service_type"],
+      "responses": [
+        "You can schedule an appointment for {service_type} services through our website, mobile app, or by calling us at 1-800-XXX-XXXX. We offer both in-person and virtual appointment options. Please allow approximately 30-60 minutes for your consultation, depending on the complexity of your needs.",
+        "To schedule a {service_type} appointment, visit our website's 'Schedule Appointment' page, use our mobile app, or call your local branch directly. We offer flexible scheduling including some evening and weekend appointments at select locations. Virtual consultations are also available for your convenience.",
+        "Scheduling a {service_type} appointment is easy. You can book through our online appointment tool, mobile app, or by calling us. We recommend bringing relevant financial documents and identification to your appointment. Most consultations take 30-45 minutes depending on your specific needs.",
+        "For {service_type} services, you can schedule an appointment through our website, mobile app, or by calling our appointment line at 1-800-XXX-XXXX. We offer in-branch meetings during regular business hours, with some locations providing extended hours and weekend availability by appointment.",
+        "To meet with a specialist about {service_type}, please schedule an appointment through our online booking system, mobile app, or by phone. We offer both in-person and virtual consultations to fit your schedule. For complex financial matters, we recommend preparing questions in advance to make the most of your time."
       ]
     }
   ],
+  
   "entities": {
-    "account_type": ["checking", "savings", "credit", "investment", "retirement", "business"],
-    "reason_code": ["moving_banks", "fees", "service", "temporary_suspension", "fraud", "other"],
-    "service_type": ["deposits", "withdrawals", "transfers", "all"],
-    "incident_type": ["unauthorized_transaction", "lost_card", "stolen_card", "suspicious_activity"],
-    "loan_type": ["personal", "auto", "mortgage", "student", "business", "home_equity"],
-    "transaction_type": ["wire_transfer", "ach", "check_deposit", "international_transfer"],
-    "banking_term": ["apr", "apy", "overdraft", "routing_number", "wire_transfer", "ach", "credit_score"],
-    "currency_type": ["usd", "eur", "gbp", "cad", "jpy"],
+    "account_type": ["checking", "savings", "credit", "investment", "retirement", "business", "money market", "certificate of deposit", "IRA", "HSA"],
+    "reason_code": ["moving_banks", "fees", "service", "temporary_suspension", "fraud", "other", "dissatisfied", "moving", "consolidating_accounts", "financial_hardship"],
+    "service_type": ["deposits", "withdrawals", "transfers", "all", "loans", "mortgages", "investments", "insurance", "wealth_management", "foreign_exchange"],
+    "incident_type": ["unauthorized_transaction", "lost_card", "stolen_card", "suspicious_activity", "phishing_attempt", "data_breach", "identity_theft", "account_takeover"],
+    "loan_type": ["personal", "auto", "mortgage", "student", "business", "home_equity", "construction", "refinance", "line_of_credit", "debt_consolidation"],
+    "transaction_type": ["wire_transfer", "ach", "check_deposit", "international_transfer", "p2p_payment", "bill_payment", "mobile_deposit", "atm_withdrawal"],
+    "banking_term": ["apr", "apy", "overdraft", "routing_number", "wire_transfer", "ach", "credit_score", "escrow", "principal", "amortization", "compound_interest"],
+    "currency_type": ["usd", "eur", "gbp", "cad", "jpy", "aud", "chf", "cny", "inr", "mxn"],
     "distance": ["1", "5", "10", "25", "50"],
-    "application_status": ["pending", "approved", "denied", "under_review", "need_documents"]
+    "application_status": ["pending", "approved", "denied", "under_review", "need_documents", "conditionally_approved", "funded", "cancelled"],
+    "day_of_week": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"],
+    "applicant_type": ["individual", "joint", "business", "trust", "minor", "senior", "student", "non_resident", "existing_customer"],
+    "term_length": ["3_month", "6_month", "1_year", "18_month", "2_year", "3_year", "5_year", "10_year", "30_year"],
+    "fee_type": ["monthly_maintenance", "overdraft", "wire_transfer", "atm", "foreign_transaction", "paper_statement", "stop_payment", "returned_item", "early_withdrawal"],
+    "security_level": ["standard", "enhanced", "maximum"],
+    "card_type": ["debit", "credit", "secured_credit", "business", "rewards", "travel", "cash_back", "prepaid"],
+    "credit_score_range": ["excellent", "good", "fair", "poor"],
+    "document_type": ["statement", "tax_document", "interest_certificate", "loan_agreement", "account_terms", "fee_schedule"]
   }
 }

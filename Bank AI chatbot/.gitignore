@@ -3,3 +3,7 @@ models
 __pycache__
 instance
 
+.env
+
+.qodo
+neural_model
